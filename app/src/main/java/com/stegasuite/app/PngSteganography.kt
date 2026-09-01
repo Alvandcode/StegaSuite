@@ -1,4 +1,4 @@
-herepackage com.stegasuite.app
+package com.stegasuite.app
 
 import android.graphics.Bitmap
 import java.io.InputStream

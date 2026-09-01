@@ -1,4 +1,4 @@
-Enterpackage com.stegasuite.app
+package com.stegasuite.app
 
 import android.graphics.BitmapFactory
 import android.net.Uri

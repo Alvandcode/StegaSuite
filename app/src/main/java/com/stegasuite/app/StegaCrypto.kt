@@ -1,4 +1,4 @@
-Enterpackage com.stegasuite.app
+package com.stegasuite.app
 
 import java.security.SecureRandom
 import javax.crypto.Cipher
