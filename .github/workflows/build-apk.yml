@@ -2,9 +2,11 @@ name: Build Android APK
 
 on:
   push:
-    branches:
-      - "**"
+    branches: ["**"]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
@@ -24,10 +26,10 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android SDK 35
+      - name: Install Android SDK packages
         run: |
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -35,9 +37,10 @@ jobs:
           gradle-version: "8.11.1"
 
       - name: Build Debug APK
-        run: gradle --no-daemon assembleDebug
+        run: gradle --no-daemon assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: Upload Debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: StegaSuite-debug-apk
