@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -84,7 +85,6 @@ class MainActivity : ComponentActivity() {
                 val n = getFileName(uri); val s = getFileSize(uri)
                 payloadInfo = "$n - ${s/1024}KB"
                 status = "فایل انتخاب شد: $payloadInfo"
-                // چک ظرفیت
                 imageUri?.let { imgUri ->
                     try {
                         val bmp = context.contentResolver.openInputStream(imgUri)?.use { BitmapFactory.decodeStream(it) }
