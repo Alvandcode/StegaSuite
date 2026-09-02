@@ -10,10 +10,12 @@ android {
 
     defaultConfig {
         applicationId = "com.stegasuite.app"
+        // ورژن خودکار: روی گیت‌هاب هر بیلد +1 میشه تا نیاز به حذف نباشه
+        val runNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
+        versionCode = 10 + runNumber // 10,11,12... همیشه بزرگتر از قبلی
+        versionName = "1.1.${runNumber}"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
     }
 
     compileOptions {
@@ -21,14 +23,19 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    buildFeatures {
-        compose = true
+    buildFeatures { compose = true }
+
+    // اسم فایل خروجی: StegaSuite-v1.1.15.apk به جای app-debug.apk
+    applicationVariants.all {
+        outputs.all {
+            val variant = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val ver = defaultConfig.versionName
+            variant.outputFileName = "StegaSuite-v${ver}.apk"
+        }
     }
 }
 
-kotlin {
-    jvmToolchain(17)
-}
+kotlin { jvmToolchain(17) }
 
 dependencies {
     implementation(platform("androidx.compose:compose-bom:2024.12.01"))
