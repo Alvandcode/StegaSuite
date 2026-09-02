@@ -14,37 +14,41 @@ object StegaCrypto {
     private const val ITERATIONS = 600_000
 
     fun encrypt(data: ByteArray, password: String): ByteArray {
-        require(password.isNotEmpty()) { "Password cannot be empty." }
+        require(password.isNotEmpty()) { "پسورد خالی است" }
         val salt = ByteArray(16).also(rng::nextBytes)
         val nonce = ByteArray(12).also(rng::nextBytes)
         val key = derive(password, salt)
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(128, nonce))
-        cipher.updateAAD(MAGIC.toByteArray())
+        cipher.updateAAD(MAGIC.toByteArray(Charsets.UTF_8))
         val encrypted = cipher.doFinal(data)
-        return MAGIC.toByteArray() + byteArrayOf(VERSION.toByte()) + salt + nonce + encrypted
+        return MAGIC.toByteArray(Charsets.UTF_8) + byteArrayOf(VERSION.toByte()) + salt + nonce + encrypted
     }
 
     fun decrypt(blob: ByteArray, password: String): ByteArray {
-        require(blob.size > 33) { "Invalid encrypted payload." }
-        require(String(blob.copyOfRange(0, 4)) == MAGIC) { "Invalid encrypted payload." }
-        require(blob[4].toInt() == VERSION) { "Unsupported payload version." }
+        require(blob.size > 33) { "داده رمز شده خراب است" }
+        require(String(blob.copyOfRange(0, 4), Charsets.UTF_8) == MAGIC) { "داده رمز شده نیست" }
+        require(blob[4].toInt() == VERSION) { "نسخه پشتیبانی نمی‌شود" }
         val salt = blob.copyOfRange(5, 21)
         val nonce = blob.copyOfRange(21, 33)
         val encrypted = blob.copyOfRange(33, blob.size)
         return try {
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.DECRYPT_MODE, derive(password, salt), GCMParameterSpec(128, nonce))
-            cipher.updateAAD(MAGIC.toByteArray())
+            cipher.updateAAD(MAGIC.toByteArray(Charsets.UTF_8))
             cipher.doFinal(encrypted)
         } catch (e: Exception) {
-            throw IllegalArgumentException("Wrong password or corrupted payload.")
+            throw IllegalArgumentException("پسورد اشتباه است یا فایل خراب شده")
         }
     }
 
     private fun derive(password: String, salt: ByteArray): SecretKeySpec {
         val spec = PBEKeySpec(password.toCharArray(), salt, ITERATIONS, 256)
-        val bytes = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
-        return SecretKeySpec(bytes, "AES")
+        try {
+            val bytes = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
+            return SecretKeySpec(bytes, "AES")
+        } finally {
+            spec.clearPassword()
+        }
     }
 }
