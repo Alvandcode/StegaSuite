@@ -1,64 +1,35 @@
 name: Build Android APK
-
 on:
-  push:
-    branches: ["**"]
+  push: { branches: ["**"] }
   workflow_dispatch:
-
-permissions:
-  contents: write
-
+permissions: { contents: write }
 jobs:
   build:
     name: Build and Release APK
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: "17"
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
-        run: |
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: "17" }
+      - uses: android-actions/setup-android@v3
+      - run: |
           yes | sdkmanager --licenses || true
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "8.11.1"
-
-      - name: Generate Gradle Wrapper if missing
-        run: |
-          if [ ! -f "./gradlew" ]; then
-            gradle wrapper --gradle-version 8.11.1
-          fi
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "8.11.1" }
+      - run: |
+          if [ ! -f "./gradlew" ]; then gradle wrapper --gradle-version 8.11.1; fi
           chmod +x ./gradlew
-
-      - name: Build Debug APK
-        run: ./gradlew --no-daemon assembleDebug --stacktrace
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      - run: ./gradlew --no-daemon assembleDebug --stacktrace
+      - run: ls -lh app/build/outputs/apk/debug/
+      - uses: actions/upload-artifact@v4
         with:
-          name: StegaSuite-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+          name: StegaSuite-v1.1.${{ github.run_number }}
+          path: app/build/outputs/apk/debug/StegaSuite-*.apk
+      - uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/debug/app-debug.apk
-          tag_name: v1.0.${{ github.run_number }}
-          name: StegaSuite v1.0.${{ github.run_number }}
+          files: app/build/outputs/apk/debug/StegaSuite-*.apk
+          tag_name: v1.1.${{ github.run_number }}
+          name: StegaSuite v1.1.${{ github.run_number }}
           generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: { GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
