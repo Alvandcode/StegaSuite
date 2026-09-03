@@ -1,3 +1,8 @@
+/**
+ * StegaSuite - StegaCrypto
+ * © طراحی و اجرا توسط alvandcode - https://github.com/Alvandcode
+ * رمزنگاری AES-256-GCM + PBKDF2
+ */
 package com.stegasuite.app
 
 import java.security.SecureRandom
