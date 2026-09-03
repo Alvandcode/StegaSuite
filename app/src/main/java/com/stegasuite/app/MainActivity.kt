@@ -1,3 +1,8 @@
+/**
+ * StegaSuite - MainActivity
+ * © طراحی و اجرا توسط alvandcode - https://github.com/Alvandcode
+ * اپ استگانوگرافی با تم گلس مورفیسم، دو زبانه، RTL/LTR
+ */
 package com.stegasuite.app
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -35,9 +40,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// دو زبانه ساده
-private val fa = mapOf("title" to "استگانوسویت","hide" to "مخفی کردن","extract" to "استخراج","img" to "۱- انتخاب عکس PNG","file" to "۲- انتخاب فایل","pass" to "رمز (پیشنهادی)","hideBtn" to "مخفی کن و ذخیره","extBtn" to "استخراج کن","status" to "وضعیت","dark" to "تیره","light" to "روشن","path" to "مسیر ذخیره:")
-private val en = mapOf("title" to "StegaSuite","hide" to "Hide","extract" to "Extract","img" to "1- Choose PNG","file" to "2- Choose File","pass" to "Password (optional)","hideBtn" to "Hide & Save","extBtn" to "Extract","status" to "Status","dark" to "Dark","light" to "Light","path" to "Saved to:")
+// دو زبانه ساده - فارسی و انگلیسی - راست‌چین و چپ‌چین
+private val fa = mapOf("title" to "استگانوسویت","hide" to "مخفی کردن","extract" to "استخراج","img" to "۱- انتخاب عکس PNG","file" to "۲- انتخاب فایل","pass" to "رمز (پیشنهادی)","hideBtn" to "مخفی کن و ذخیره","extBtn" to "استخراج کن","status" to "وضعیت","dark" to "تیره","light" to "روشن","path" to "مسیر ذخیره:","copyright" to "© طراحی و اجرا توسط alvandcode","contact" to "ارتباط با سازنده")
+private val en = mapOf("title" to "StegaSuite","hide" to "Hide","extract" to "Extract","img" to "1- Choose PNG","file" to "2- Choose File","pass" to "Password (optional)","hideBtn" to "Hide & Save","extBtn" to "Extract","status" to "Status","dark" to "Dark","light" to "Light","path" to "Saved to:","copyright" to "© Designed & Developed by alvandcode","contact" to "Contact")
 
 class MainActivity : ComponentActivity(){
  override fun onCreate(b:Bundle?){ super.onCreate(b); setContent{ App() } }
@@ -110,6 +115,7 @@ class MainActivity : ComponentActivity(){
       if(!extractMode){
        Spacer(Modifier.height(8.dp))
        Button(onClick={pickFile.launch("*/*")}, modifier=Modifier.fillMaxWidth(), shape=RoundedCornerShape(14.dp)){ Text(if(payloadUri==null) t["file"]!! else "✓ $payloadInfo") }
+       Text(if(isFa) "از همه فرمت‌ها پشتیبانی می‌شود: متن، تصویر، ZIP و ..." else "Supports any file: txt, zip, pdf, ...", style=MaterialTheme.typography.bodySmall, color=if(isDark) Color.White.copy(0.5f) else Color.Black.copy(0.5f))
       }
       Spacer(Modifier.height(12.dp))
       OutlinedTextField(value=pass, onValueChange={pass=it}, label={Text(t["pass"]!!)}, modifier=Modifier.fillMaxWidth(), singleLine=true, visualTransformation=if(showPass) VisualTransformation.None else PasswordVisualTransformation(), trailingIcon={TextButton(onClick={showPass=!showPass}){Text(if(showPass) "🙈" else "👁")}} , shape=RoundedCornerShape(14.dp))
@@ -122,7 +128,7 @@ class MainActivity : ComponentActivity(){
       Text(t["status"]!!, fontWeight=FontWeight.Bold, color=if(isDark) Color.White else Color.Black)
       Spacer(Modifier.height(6.dp))
       Text(status, color=if(isDark) Color.White.copy(0.9f) else Color.Black.copy(0.8f))
-      // لینک مسیر ذخیره - کلیک باز می‌کنه
+      // لینک مسیر ذخیره - کلیک باز می‌کنه و وارد پوشه/فایل میشه
       if(lastSavedUri!=null){
        Spacer(Modifier.height(8.dp))
        Text(t["path"]!!, style=MaterialTheme.typography.labelMedium, color=if(isDark) Color.Cyan.copy(0.8f) else Color(0xFF0EA5E9))
@@ -131,7 +137,23 @@ class MainActivity : ComponentActivity(){
          try{ ctx.startActivity(Intent(Intent.ACTION_VIEW).apply{ setDataAndType(lastSavedUri, "*/*"); addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)}) }catch(_:Exception){}
         }
        }, textAlign=TextAlign.Start)
-       Text(lastSavedUri.toString(), style=MaterialTheme.typography.bodySmall, color=if(isDark) Color.White.copy(0.5f) else Color.Black.copy(0.5f), maxLines=2)
+       Text(lastSavedUri.toString(), style=MaterialTheme.typography.bodySmall, color=if(isDark) Color.White.copy(0.5f) else Color.Black.copy(0.5f), maxLines=2, modifier=Modifier.clickable{
+        try{ val intent=Intent(Intent.ACTION_VIEW).apply{ setData(lastSavedUri); addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)}; ctx.startActivity(Intent.createChooser(intent, "Open")) }catch(_:Exception){}
+       })
+      }
+     }
+
+     // فوتر کپی‌رایت و ارتباط با سازنده - گلس مورفیسم
+     GlassCard{
+      Column(Modifier.fillMaxWidth(), horizontalAlignment=Alignment.CenterHorizontally){
+       Text(t["copyright"]!!, style=MaterialTheme.typography.bodySmall, fontWeight=FontWeight.Medium, color=if(isDark) Color.White.copy(0.7f) else Color.Black.copy(0.6f), textAlign=TextAlign.Center)
+       Spacer(Modifier.height(6.dp))
+       Row(verticalAlignment=Alignment.CenterVertically, horizontalArrangement=Arrangement.Center){
+        Text(t["contact"]!! + ": ", style=MaterialTheme.typography.bodySmall, color=if(isDark) Color.White.copy(0.5f) else Color.Black.copy(0.5f))
+        Text("github.com/Alvandcode", color=Color(0xFF38BDF8), style=MaterialTheme.typography.bodySmall, fontWeight=FontWeight.Bold, modifier=Modifier.clickable{
+         try{ val i = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Alvandcode")); ctx.startActivity(i) }catch(_:Exception){}
+        })
+       }
       }
      }
     }
