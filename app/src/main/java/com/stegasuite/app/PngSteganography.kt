@@ -1,3 +1,8 @@
+/**
+ * StegaSuite - PngSteganography
+ * © طراحی و اجرا توسط alvandcode - https://github.com/Alvandcode
+ * پنهان‌سازی هر نوع فایل داخل عکس PNG با LSB
+ */
 package com.stegasuite.app
 
 import android.graphics.Bitmap
