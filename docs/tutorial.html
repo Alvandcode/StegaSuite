@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>آموزش قدم‌به‌قدم StegaSuite | مخفی‌سازی امن فایل‌ها</title>
+<meta name="description" content="آموزش تصویری و کامل استفاده از اپلیکیشن StegaSuite — مخفی‌سازی هر نوع فایل درون تصویر، صدا و فایل‌های دیگر با رمزنگاری AES-256">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a1a; --bg2:#0f0f2a; --card:#161635; --card2:#1c1c45;
+    --line:rgba(255,255,255,.08); --txt:#eef2ff; --muted:#a9b4d0;
+    --purple:#a855f7; --purple-d:#7c3aed; --purple-l:#c084fc;
+    --pink:#ec4899; --blue:#60a5fa; --green:#34d399; --amber:#fbbf24;
+    --rose:#fb7185; --teal:#2dd4bf; --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--txt);
+    font-family:"Vazirmatn",Tahoma,"IRANSans","Segoe UI",sans-serif;
+    background:
+      radial-gradient(1100px 500px at 85% -5%, rgba(168,85,247,.14), transparent 60%),
+      radial-gradient(900px 480px at 10% 0%, rgba(236,72,153,.12), transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+    line-height:2; font-size:16px;
+  }
+  a{color:var(--purple-l)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px 90px}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;overflow:hidden;border-radius:0 0 34px 34px;
+    background:linear-gradient(135deg,#7c3aed 0%,#a855f7 35%,#ec4899 65%,#6366f1 100%);
+    padding:64px 20px 70px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+  .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;filter:blur(2px);opacity:.25}
+  .hero::before{width:380px;height:380px;background:#fff;top:-180px;left:-100px}
+  .hero::after{width:280px;height:280px;background:#fde68a;bottom:-150px;right:-80px}
+  .hero h1{margin:0 0 10px;font-size:clamp(28px,5vw,48px);font-weight:900;text-shadow:0 3px 18px rgba(0,0,0,.35)}
+  .hero .subtitle{margin:8px auto 0;max-width:720px;color:#f1f5ff;font-size:clamp(15px,2.6vw,19px)}
+  .hero .badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
+    padding:6px 16px;border-radius:999px;font-size:14px;font-weight:700;backdrop-filter:blur(6px)}
+  .hero .cta{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .hero .cta a{text-decoration:none;font-weight:900;padding:12px 30px;border-radius:999px;transition:.2s}
+  .btn-primary{background:#fff;color:#111c33}
+  .btn-outline{background:rgba(0,0,0,.3);color:#fff;border:1px solid rgba(255,255,255,.5)}
+  .hero .cta a:hover{transform:translateY(-3px)}
+
+  /* ---------- Sticky nav ---------- */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(10,10,26,.85);border-bottom:1px solid var(--line)}
+  nav .inner{max-width:1060px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;
+    overflow-x:auto;scrollbar-width:none}
+  nav .inner::-webkit-scrollbar{display:none}
+  nav a{flex:0 0 auto;text-decoration:none;color:var(--txt);font-weight:700;font-size:14px;
+    padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+    transition:.2s}
+  nav a:hover,nav a.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+  /* ---------- Sections & cards ---------- */
+  section{margin-top:46px}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .sec-head .ico{width:52px;height:52px;flex:0 0 52px;border-radius:16px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--purple-d),var(--pink));box-shadow:0 10px 26px rgba(168,85,247,.25)}
+  .sec-head .ico svg{width:28px;height:28px;stroke:#fff}
+  .sec-head h2{margin:0;font-size:clamp(20px,3.6vw,28px);font-weight:900}
+  .sec-head small{display:block;color:var(--muted);font-weight:400;font-size:14px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));
+    border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:16px 0;
+    box-shadow:0 14px 40px rgba(0,0,0,.35)}
+  .card h3{margin:0 0 8px;font-size:19px;color:var(--amber)}
+  .card h3 .tag{font-size:12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);
+    color:var(--amber);border-radius:999px;padding:2px 12px;margin-right:8px;vertical-align:middle}
+  .card h3 .tag.ok{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.45);color:var(--green)}
+  .card h3 .tag.warn{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.45);color:var(--rose)}
+  .card h3 .tag.info{background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.45);color:var(--blue)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+  .mini{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .mini b{color:var(--purple-l)}
+  ol.steps,ul.tips{margin:10px 0;padding-right:22px}
+  ol.steps li,ul.tips li{margin:8px 0}
+  ol.steps li::marker{color:var(--purple);font-weight:900}
+
+  /* ---------- Code ---------- */
+  .code{position:relative;background:#070d1a;border:1px solid var(--line);border-radius:14px;
+    margin:12px 0;overflow:hidden}
+  .code header{display:flex;justify-content:space-between;align-items:center;
+    padding:6px 14px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.03)}
+  .code pre{direction:ltr;text-align:left;margin:0;padding:14px 16px;overflow-x:auto;
+    font-family:Consolas,"Cascadia Code",monospace;font-size:13.5px;line-height:1.9;color:#d7f0ff}
+  .code .out{border-top:1px dashed var(--line);color:#c084fc}
+  .copy{cursor:pointer;border:1px solid var(--purple);background:transparent;color:var(--purple);
+    border-radius:9px;padding:3px 14px;font-family:inherit;font-size:12.5px;font-weight:700;transition:.2s}
+  .copy:hover{background:var(--purple);color:#fff}
+
+  /* ---------- Callouts & table ---------- */
+  .note{border-radius:14px;padding:14px 18px;margin:12px 0;font-size:15px;border:1px solid}
+  .note.info{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.4)}
+  .note.ok{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.4)}
+  .note.warn{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.45)}
+  .note.bad{background:rgba(251,113,133,.1);border-color:rgba(251,113,133,.45)}
+  .note b{display:block;margin-bottom:2px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:right;vertical-align:top}
+  th{background:rgba(168,85,247,.12);color:var(--purple-l)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.025)}
+  .tbl-wrap{overflow-x:auto;border-radius:14px}
+
+  /* ---------- Feature cards ---------- */
+  .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:16px 0}
+  .feat{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:20px;
+    transition:.2s}
+  .feat:hover{border-color:var(--purple);transform:translateY(-2px)}
+  .feat .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;margin-bottom:12px;
+    font-size:22px}
+  .feat h4{margin:0 0 6px;font-size:16px;color:var(--purple-l)}
+  .feat p{margin:0;color:var(--muted);font-size:14px;line-height:1.8}
+
+  /* ---------- Flow diagram ---------- */
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0;padding:18px;
+    background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:14px}
+  .flow-step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;
+    font-weight:700;font-size:14px;white-space:nowrap}
+  .flow-arrow{color:var(--purple);font-size:20px;font-weight:900}
+
+  /* ---------- Screenshot placeholder ---------- */
+  .screenshot{background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(236,72,153,.08));
+    border:2px dashed rgba(168,85,247,.3);border-radius:16px;padding:40px 20px;text-align:center;
+    margin:16px 0;color:var(--muted);font-size:15px}
+  .screenshot .ph{font-size:48px;margin-bottom:10px}
+
+  footer{margin-top:60px;text-align:center;color:var(--muted);font-size:14px}
+  footer .links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+  footer .links a{text-decoration:none;font-weight:700;border:1px solid var(--purple);
+    border-radius:999px;padding:8px 26px}
+  footer .top{display:inline-block;margin-top:12px;text-decoration:none;font-weight:700;
+    border:1px solid var(--purple);border-radius:999px;padding:8px 26px}
+
+  @media (max-width:640px){
+    body{font-size:15px}
+    .card{padding:18px}
+    .sec-head .ico{width:44px;height:44px;flex-basis:44px}
+    .flow{flex-direction:column;align-items:stretch}
+    .flow-arrow{transform:rotate(90deg);text-align:center}
+  }
+</style>
+</head>
+<body id="top">
+
+<header class="hero">
+  <h1>🛡️ StegaSuite</h1>
+  <p class="subtitle">مخفی‌سازی امن فایل‌ها با رمزنگاری AES-256 — هر فایلی را درون هر فایلی پنهان کن</p>
+  <div class="badges">
+    <span class="badge">AES-256-GCM</span>
+    <span class="badge">اندروید</span>
+    <span class="badge">تم فارسی و انگلیسی</span>
+    <span class="badge">۳۰+ فرمت پشتیبانی</span>
+    <span class="badge">بدون نیاز به روت</span>
+    <span class="badge">متن‌باز</span>
+  </div>
+  <div class="cta">
+    <a class="btn-primary" href="https://github.com/Alvandcode/StegaSuite/releases" target="_blank" rel="noopener">⬇️ دانلود آخرین نسخه</a>
+    <a class="btn-outline" href="https://github.com/Alvandcode/StegaSuite" target="_blank" rel="noopener">⭐ ستاره به پروژه</a>
+  </div>
+</header>
+
+<nav><div class="inner" id="navlinks">
+  <a href="#intro">معرفی</a>
+  <a href="#features">امکانات</a>
+  <a href="#hide">مخفی‌سازی</a>
+  <a href="#extract">استخراج</a>
+  <a href="#formats">فرمت‌ها</a>
+  <a href="#crypto">رمزنگاری</a>
+  <a href="#capacity">ظرفیت</a>
+  <a href="#limits">محدودیت‌ها</a>
+  <a href="#faq">عیب‌یابی</a>
+</div></nav>
+
+<div class="wrap">
+
+<!-- ================= INTRO ================= -->
+<section id="intro">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+    <h2>StegaSuite چیست؟<small>یک ابزار متن‌باز برای مخفی‌سازی امن فایل‌ها روی اندروید</small></h2>
+  </div>
+
+  <div class="card">
+    <p>
+      <b>StegaSuite</b> یک اپلیکیشن اندرویدی متن‌باز است که با استفاده از تکنیک <b>Steganography</b> (نهان‌نگاری)
+      امکان مخفی‌سازی هر نوع فایلی را درون فایل‌های دیگر فراهم می‌کند. برخلاف رمزنگاری معمولی که فقط محتوا را رمز می‌کند،
+      StegaSuite وجود خود فایل مخفی شده را هم پنهان می‌کند — یعنی کسی که فایل حامل را می‌بیند، حتی نمی‌داند چیزی درونش پنهان شده!
+    </p>
+
+    <div class="flow">
+      <div class="flow-step">📷 فایل حامل (تصویر/صدا/...)</div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-step">📄 فایل مخفی شونده</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">🔑 رمز عبور (اختیاری)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" style="background:linear-gradient(135deg,var(--purple-d),var(--pink));color:#fff;border-color:var(--purple)">🔒 فایل خروجی با ظاهر عادی</div>
+    </div>
+
+    <div class="note info">
+      <b>💡 چرا Steganography؟</b>
+      رمزنگاری معمولی (مثل ZIP رمزدار) مشخص می‌کند که فایل رمز شده است. اما Steganography فایل رمز شده را درون یک فایل کاملاً عادی (مثلاً یک عکس) پنهان می‌کند. هیچ‌کس بدون داشتن ابزار مناسب نمی‌تواند بفهمد چیزی پنهان شده!
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="features">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
+    <h2>امکانات کلیدی<small>چه چیزی StegaSuite را متفاوت می‌کند</small></h2>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="ico" style="background:rgba(168,85,247,.15)">🔐</div>
+      <h4>رمزنگاری AES-256-GCM</h4>
+      <p>فایل مخفی شده با استاندارد نظامی AES-256 رمز می‌شود. حتی اگر کسی مکانیزم مخفی‌سازی را پیدا کند، بدون رمز عبور قادر به خواندن محتوا نیست.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(236,72,153,.15)">🎨</div>
+      <h4>پشتیبانی از ۳۰+ فرمت</h4>
+      <p>PNG, BMP, TIFF, WebP, WAV, MP3, MP4, PDF, ZIP و ده‌ها فرمت دیگر به عنوان حامل. فایل مخفی شونده هم هیچ محدودیتی ندارد.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(96,165,250,.15)">🌍</div>
+      <h4>رابط کاربری دوزبانه</h4>
+      <p>پشتیبانی کامل از فارسی (RTL) و انگلیسی (LTR) با قابلیت جابجایی آنی بین زبان‌ها. طراحی مدرن با تم تاریک و روشن.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(52,211,153,.15)">🧠</div>
+      <h4>تشخیص هوشمند فرمت</h4>
+      <p>نیازی به انتخاب دستی فرمت نیست. اپلیکیشن با خواندن Magic Bytes فایل حامل، فرمت را به صورت خودکار تشخیص می‌دهد.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(251,191,36,.15)">📊</div>
+      <h4>محاسبه ظرفیت</h4>
+      <p>قبل از مخفی‌سازی، ظرفیت واقعی فایل حامل نمایش داده می‌شود تا بدانید حداکثر چه حجمی می‌توانید مخفی کنید.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(251,113,133,.15)">⚡</div>
+      <h4>بدون نیاز به روت</h4>
+      <p>بدون نیاز به دسترسی روت یا جیلبریک. مستقیماً از گوگل‌پلی یا GitHub Releases نصب و استفاده کنید.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HIDE ================= -->
+<section id="hide">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+    <h2>آموزش مخفی‌سازی فایل<small>قدم‌به‌قدم از انتخاب فایل تا ذخیره خروجی</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>گام ۱: انتخاب فایل حامل <span class="tag info">Carrier</span></h3>
+    <p>فایل حامل فایلی است که فایل مخفی شونده درون آن پنهان می‌شود. این فایل بعد از مخفی‌سازی کاملاً عادی به نظر می‌رسد.</p>
+    <ol class="steps">
+      <li>اپلیکیشن را باز کنید. در حالت پیش‌فرض روی <b>«مخفی‌سازی»</b> (Hide) قرار دارد.</li>
+      <li>در کارت اول روی دکمه <b>«انتخاب فایل حامل»</b> کلیک کنید.</li>
+      <li>از فایل‌پیکر سیستم یک فایل انتخاب کنید (تصویر، صدا، ویدیو، PDF و...).</li>
+      <li>اطلاعات فایل نمایش داده می‌شود: نوع فرمت، نام فایل، اندازه، و <b>ظرفیت مخفی‌سازی</b>.</li>
+    </ol>
+
+    <div class="note warn">
+      <b>⚠️ هشدار فرمت‌های Lossy</b>
+      اگر فایل حامل JPEG، WebP یا فرمت‌های فشرده با کیفیت از دست رفته باشد، یک هشدار نارنجی نمایش داده می‌شود.
+      این فرمت‌ها ممکن است داده مخفی شده را خراب کنند. برای بهترین نتیجه از <b>PNG</b> یا <b>BMP</b> استفاده کنید.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>گام ۲: انتخاب فایل مخفی شونده <span class="tag info">Payload</span></h3>
+    <p>هر فایلی را می‌توانید مخفی کنید: متن، تصویر، صدا، ویدیو، PDF، ZIP و هر فرمت دیگری.</p>
+    <ol class="steps">
+      <li>در کارت دوم روی دکمه <b>«انتخاب فایل مخفی شونده»</b> کلیک کنید.</li>
+      <li>فایل مورد نظر را انتخاب کنید.</li>
+      <li>نام و اندازه فایل نمایش داده می‌شود.</li>
+    </ol>
+    <div class="note ok"><b>✅ بدون محدودیت فرمت</b>هیچ محدودیتی در نوع فایل مخفی شونده وجود ندارد. هر فایلی با هر پسوندی قابل مخفی‌سازی است.</div>
+  </div>
+
+  <div class="card">
+    <h3>گام ۳: تنظیم رمز عبور <span class="tag">اختیاری</span></h3>
+    <p>رمز عبور باعث می‌شود فایل مخفی شده علاوه بر مخفی بودن، با <b>AES-256</b> هم رمز شود. این لایه امنیتی اضافه را <b>Defense in Depth</b> می‌نامند.</p>
+    <ol class="steps">
+      <li>در کارت سوم یک رمز عبور وارد کنید.</li>
+      <li>با کلیک روی آیکون چشم 👁️ می‌توانید رمز را نمایش یا پنهان کنید.</li>
+      <li>اگر رمز خالی بگذارید، فایل فقط با CRC32 ذخیره می‌شود (بدون رمزنگاری).</li>
+    </ol>
+    <div class="note bad"><b>⚠️ رمز عبور را فراموش نکنید!</b>
+    اگر رمز عبور را فراموش کنید، امکان بازیابی فایل مخفی شده وجود ندارد. رمز را در جای امنی یادداشت کنید.</div>
+  </div>
+
+  <div class="card">
+    <h3>گام ۴: ذخیره فایل خروجی <span class="tag ok">ذخیره</span></h3>
+    <ol class="steps">
+      <li>روی دکمه <b>«مخفی‌سازی و ذخیره»</b> کلیک کنید.</li>
+      <li>منتظر بمانید تا عملیات تمام شود (معمولاً چند ثانیه).</li>
+      <li>فایل خروجی با نام <span dir="ltr">photo(st).png</span> ذخیره می‌شود (پسوند <span dir="ltr">(st)</span> اضافه می‌شود).</li>
+      <li>روی لینک فایل ذخیره شده کلیک کنید تا آن را باز کنید.</li>
+    </ol>
+  </div>
+
+  <div class="screenshot">
+    <div class="ph">📱</div>
+    <b>اسکرین‌شات محیط مخفی‌سازی</b><br>
+    نمای کلی اپلیکیشن در حالت Hide با فایل حامل انتخاب شده
+  </div>
+</section>
+
+<!-- ================= EXTRACT ================= -->
+<section id="extract">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg></span>
+    <h2>آموزش استخراج فایل مخفی شده<small>بازیابی فایل از درون فایل حامل</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>مراحل استخراج <span class="tag ok">ساده</span></h3>
+    <ol class="steps">
+      <li>روی آیکون <b>قفل باز</b> 🔓 در بالای صفحه کلیک کنید تا به حالت <b>«استخراج»</b> (Extract) بروید.</li>
+      <li>فایل حاملی که فایل مخفی شده درونش پنهان شده را انتخاب کنید.</li>
+      <li>اگر فایل با رمز عبور مخفی شده بود، رمز را وارد کنید.</li>
+      <li>روی دکمه <b>«استخراج فایل مخفی شده»</b> کلیک کنید.</li>
+      <li>فایل استخراج شده ذخیره و نمایش داده می‌شود.</li>
+    </ol>
+
+    <div class="note info">
+      <b>💡 نکته مهم: تشخیص خودکار</b>
+      اپلیکیشن فایل مخفی شده را از روی Magic Bytes تشخیص می‌دهد، نه از پسوند فایل. یعنی حتی اگر نام فایل حامل را تغییر دهید یا پسوند آن را عوض کنید، استخراج همچنان کار می‌کند!
+    </div>
+  </div>
+
+  <div class="screenshot">
+    <div class="ph">🔓</div>
+    <b>اسکرین‌شات محیط استخراج</b><br>
+    نمای اپلیکیشن در حالت Extract با فایل حامل انتخاب شده
+  </div>
+</section>
+
+<!-- ================= FORMATS ================= -->
+<section id="formats">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></span>
+    <h2>فرمت‌های پشتیبانی شده<small>لیست کامل فرمت‌های قابل استفاده به عنوان حامل و مخفی شونده</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>فرمت‌های حامل (Carrier) <span class="tag ok">با کیفیت بالا</span></h3>
+    <p>این فرمت‌ها به صورت بومی و با بالاترین کیفیت پشتیبانی می‌شوند:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>فرمت</th><th>پسوند</th><th>روش مخفی‌سازی</th><th>توضیح</th></tr>
+      <tr><td><b>PNG</b></td><td dir="ltr">.png</td><td>LSB پیکسلی</td><td>بهترین گزینه — بدون افت کیفیت</td></tr>
+      <tr><td><b>BMP</b></td><td dir="ltr">.bmp</td><td>LSB پیکسلی</td><td>کیفیت عالی، حجم بالا</td></tr>
+      <tr><td><b>WAV</b></td><td dir="ltr">.wav</td><td>LSB نمونه صوتی</td><td>صدا بدون تغییر شنیداری</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>فرمت‌های حامل (Carrier) <span class="tag warn">با احتیاط</span></h3>
+    <p>این فرمت‌ها با روش Generic LSB پشتیبانی می‌شوند. برخی ممکن است باعث افت کیفیت شوند:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>دسته‌بندی</th><th>فرمت‌ها</th><th>توضیح</th></tr>
+      <tr><td><b>تصاویر</b></td><td dir="ltr">TIFF, WebP, GIF, SVG</td><td>با تشخیص ساختار فایل، هدر پرش می‌شود</td></tr>
+      <tr><td><b>صدا</b></td><td dir="ltr">MP3, FLAC, OGG, M4A, AAC</td><td>پس از هدر فایل صوتی، LSB تغییر می‌کند</td></tr>
+      <tr><td><b>ویدیو</b></td><td dir="ltr">MP4, AVI, MKV, MOV, WebM</td><td>تشخیص اتم‌های MP4/Matroska</td></tr>
+      <tr><td><b>اسناد</b></td><td dir="ltr">PDF, DOCX, XLSX, PPTX, TXT</td><td>پرش تا %%EOF یا هدر فایل</td></tr>
+      <tr><td><b>آرشیو</b></td><td dir="ltr">ZIP, RAR, 7Z, TAR, GZ</td><td>پرش از هدر ۳۰ بایتی ZIP</td></tr>
+      <tr><td><b>کد</b></td><td dir="ltr">JS, PY, TS, HTML, CSS</td><td>پرش ۴ بایت از ابتدای فایل</td></tr>
+    </table></div>
+
+    <div class="note warn">
+      <b>⚠️ فرمت‌های Lossy</b>
+      فرمت‌های JPEG و WebP از فشرده‌سازی با افت کیفیت استفاده می‌کنند. اگر فایل حامل JPEG باشد، ممکن است داده مخفی شده خراب شود. برای نتیجه مطمئن از <b>PNG</b> یا <b>BMP</b> استفاده کنید.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>فرمت‌های مخفی شونده (Payload) <span class="tag ok">بدون محدودیت</span></h3>
+    <div class="grid">
+      <div class="mini"><b>📄 اسناد</b>PDF, DOCX, XLSX, PPTX, TXT, CSV, JSON, XML, Markdown</div>
+      <div class="mini"><b>🖼️ تصاویر</b>PNG, JPG, GIF, BMP, SVG, WebP, TIFF</div>
+      <div class="mini"><b>🎵 صدا</b>MP3, WAV, FLAC, OGG, M4A, AAC</div>
+      <div class="mini"><b>🎬 ویدیو</b>MP4, AVI, MKV, MOV, WebM</div>
+      <div class="mini"><b>📦 آرشیو</b>ZIP, RAR, 7Z, TAR, GZ</div>
+      <div class="mini"><b>💻 کد</b>JS, PY, TS, HTML, CSS, Java, Kotlin</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CRYPTO ================= -->
+<section id="crypto">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+    <h2>جزئیات رمزنگاری<small>چگونه فایل شما محافظت می‌شود</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>لایه اول: مخفی‌سازی (Steganography) <span class="tag info">LSB</span></h3>
+    <p>فایل مخفی شده در <b>کم‌اهمیت‌ترین بیت‌ها</b> (Least Significant Bit) فایل حامل قرار می‌گیرد. این تغییر آنقدر کوچک است که با چشم غیرمسلح یا ابزار معمولی قابل تشخیص نیست.</p>
+    <div class="grid">
+      <div class="mini"><b>تصاویر</b>هر پیکسل ۳ کانال RGB دارد. بیت آخر هر کانال تغییر می‌کند. تغییر رنگ: حداکثر ۱ از ۲۵۵.</div>
+      <div class="mini"><b>صدا</b>هر نمونه صوتی LSB دارد. تغییر صدا: غیرقابل تشخیص با گوش انسان.</div>
+      <div class="mini"><b>فایل عمومی</b>بیت آخر هر بایت پس از هدر فایل تغییر می‌کند.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>لایه دوم: رمزنگاری (Encryption) <span class="tag ok">AES-256-GCM</span></h3>
+    <p>اگر رمز عبور تنظیم شده باشد، داده قبل از مخفی‌سازی با <b>AES-256-GCM</b> رمز می‌شود:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>پارامتر</th><th>مقدار</th><th>توضیح</th></tr>
+      <tr><td>الگوریتم</td><td dir="ltr">AES/GCM/NoPadding</td><td>رمزنگاری تصدیق شده (Authenticated Encryption)</td></tr>
+      <tr><td>اندازه کلید</td><td dir="ltr">256 bits</td><td>امن در برابر حملات کوانتومی فعلی</td></tr>
+      <tr><td>استخراج کلید</td><td dir="ltr">PBKDF2WithHmacSHA256</td><td>استاندارد استخراج کلید از رمز عبور</td></tr>
+      <tr><td>تعداد تکرار</td><td dir="ltr">600,000</td><td>مقاوم در برابر brute-force</td></tr>
+      <tr><td>Salt</td><td dir="ltr">16 bytes</td><td>تصادفی با SecureRandom</td></tr>
+      <tr><td>Nonce (IV)</td><td dir="ltr">12 bytes</td><td>تصادفی با SecureRandom</td></tr>
+      <tr><td>تگ GCM</td><td dir="ltr">128 bits</td><td>تصدیق یکپارچگی داده</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>ساختار فایل خروجی <span class="tag">فناوری</span></h3>
+    <p>هر فایل مخفی شده دارای ساختار زیر است:</p>
+    <div class="code"><header><span>binary structure</span></span></header><pre>
+┌─────────────────────────────────────────────────┐
+│  Magic Bytes: SGP2 / SGF1 / SGA1  (4 bytes)    │  ← تشخیص نوع فایل مخفی
+│  Payload Length                    (8 bytes)    │  ← اندازه داده مخفی شده
+│  ┌───────────────────────────────────────────┐  │
+│  │  Encrypted/CRC'd Payload                 │  │  ← داده رمز شده یا CRC
+│  │  ┌─────────────────────────────────────┐  │  │
+│  │  │  Filename Length      (4 bytes)     │  │  │  ← طول نام فایل
+│  │  │  Filename (UTF-8)    (≤1024 bytes) │  │  │  ← نام اصلی فایل
+│  │  │  File Content         (N bytes)     │  │  │  ← محتوای اصلی فایل
+│  │  └─────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────┘</pre></div>
+  </div>
+
+  <div class="card">
+    <h3>تشخیص فرمت با Magic Bytes <span class="tag info">هوشمند</span></h3>
+    <p>اپلیکیشن برای جلوگیری از خرابی فایل حامل، هدر فرمت‌ها را شناسایی و از آن‌ها رد می‌شود:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>فرمت</th><th>Magic Bytes</th><th>بایت امن (Safe Offset)</th></tr>
+      <tr><td>JPEG</td><td dir="ltr">FF D8</td><td>متغیر — تا SOS/EOI اسکن می‌کند</td></tr>
+      <tr><td>PDF</td><td dir="ltr">25 25 (%%)</td><td>متغیر — تا %%EOF اسکن می‌کند</td></tr>
+      <tr><td>ZIP</td><td dir="ltr">50 4B 03 04</td><td dir="ltr">30</td></tr>
+      <tr><td>RAR</td><td dir="ltr">52 69 63 68</td><td dir="ltr">12</td></tr>
+      <tr><td>Matroska</td><td dir="ltr">1A 45 DF A3</td><td dir="ltr">4</td></tr>
+      <tr><td>GIF</td><td dir="ltr">47 49 46</td><td dir="ltr">13</td></tr>
+      <tr><td>TIFF</td><td dir="ltr">49 49 2A 00 / 4D 4D 00 2A</td><td dir="ltr">8</td></tr>
+      <tr><td>سایر</td><td>—</td><td dir="ltr">4 (پیش‌فرض)</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ================= CAPACITY ================= -->
+<section id="capacity">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></span>
+    <h2>محاسبه ظرفیت<small>چقدر فایل می‌توانید مخفی کنید</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>فرمول‌های محاسبه ظرفیت</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>نوع حامل</th><th>فرمول</th><th>مثال</th></tr>
+      <tr><td><b>PNG/BMP</b></td><td dir="ltr">(عرض × ارتفاع × 3) ÷ 8</td><td>تصویر ۱۹۲۰×۱۰۸۰: ≈ ۷۷۷ کیلوبایت</td></tr>
+      <tr><td><b>WAV</b></td><td dir="ltr">(تعداد نمونه × کانال‌ها) ÷ 8</td><td>صدای ۱۰ ثانیه ۴۴.۱kHz: ≈ ۲۵۹ کیلوبایت</td></tr>
+      <tr><td><b>عمومی</b></td><td dir="ltr">(اندازه فایل - بایت امن) ÷ 8</td><td>فایل ۱ مگابایتی: ≈ ۱۲۲ کیلوبایت</td></tr>
+    </table></div>
+
+    <div class="note info">
+      <b>💡 نکته مهم</b>
+      حداکثر ظرفیت مفید کمی کمتر از ظرفیت خام است. اپلیکیشن ۵۰ بایت اضافی برای هدر و سربار رمزنگاری کنار می‌گذارد.
+      همچنین اگر رمز عبور تنظیم شود، اندازه داده رمز شده کمی بیشتر از داده اصلی خواهد بود (به خاطر Salt, Nonce, و GCM Tag).
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>راهنمای سریع ظرفیت <span class="tag ok">کاربردی</span></h3>
+    <div class="grid">
+      <div class="mini"><b>🖼️ تصویر ۱۲ مگاپیکسل</b>≈ ۴.۳ مگابایت ظرفیت — برای مخفی‌سازی یک سند PDF یا چند عکس کافی است.</div>
+      <div class="mini"><b>🎵 صدای ۱ دقیقه WAV</b>≈ ۱.۵ مگابایت ظرفیت — برای مخفی‌سازی یک فایل متنی یا چند تصویر کوچک کافی است.</div>
+      <div class="mini"><b>📄 فایل ۱ مگابایتی</b>≈ ۱۲۲ کیلوبایت ظرفیت — برای مخفی‌سازی یک فایل متنی یا چند تصویر کوچک کافی است.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIMITS ================= -->
+<section id="limits">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+    <h2>محدودیت‌ها و نکات مهم<small>این موارد را قبل از استفاده بخوانید</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>محدودیت‌های فنی</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>محدودیت</th><th>توضیح</th><th>راه‌حل</th></tr>
+      <tr>
+        <td><b>حداکثر اندازه فایل</b></td>
+        <td>فایل مخفی شده حداکثر ۵۰ مگابایت باشد</td>
+        <td>فایل را فشرده (ZIP) کنید یا بخش‌های کوچک‌تر بسازید</td>
+      </tr>
+      <tr>
+        <td><b>طول نام فایل</b></td>
+        <td>نام فایل حداکثر ۱۰۲۴ بایت (حدود ۳۴۰ حرف فارسی)</td>
+        <td>نام‌های کوتاه‌تر استفاده کنید</td>
+      </tr>
+      <tr>
+        <td><b>فرمت‌های Lossy</b></td>
+        <td>JPEG و WebP ممکن است داده را خراب کنند</td>
+        <td>از PNG یا BMP استفاده کنید</td></tr>
+      <tr>
+        <td><b>ظرفیت محدود</b></td>
+        <td>اندازه فایل مخفی شده به اندازه فایل حامل بستگی دارد</td>
+        <td>فایل حامل بزرگ‌تر انتخاب کنید</td>
+      </tr>
+      <tr>
+        <td><b>فایل‌های ویرایش شده</b></td>
+        <td>اگر فایل حامل بعد از مخفی‌سازی ویرایش شود (مثل crop عکس)، داده خراب می‌شود</td>
+        <td>فایل حامل را دستکاری نکنید</td>
+      </tr>
+      <tr>
+        <td><b>V1 Legacy</b></td>
+        <td>فایل‌های مخفی شده با نسخه قدیمی‌تر نام فایل اصلی را ندارند</td>
+        <td>از نسخه جدید استفاده کنید</td>
+      </tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>هشدارهای امنیتی <span class="tag warn">مهم</span></h3>
+    <ul class="tips">
+      <li><b>رمز عبور را فراموش نکنید:</b> بدون رمز عبور، امکان بازیابی فایل وجود ندارد.</li>
+      <li><b>رمز عبور قوی انتخاب کنید:</b> از ترکیب حروف، اعداد و نمادها استفاده کنید.</li>
+      <li><b>فایل حامل را ذخیره کنید:</b> فایل حامل تنها کلید بازیابی فایل مخفی شده است.</li>
+      <li><b>از اشتراک‌گذاری مستقیم خودداری کنید:</b> فایل حامل را از طریق ایمیل یا پیام‌رسان ارسال نکنید — ممکن است فشرده یا ویرایش شود.</li>
+      <li><b>نسخه پشتیبان بگیرید:</b> همیشه یک نسخه پشتیبان از فایل حامل داشته باشید.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>بهترین شیوه‌ها <span class="tag ok">پیشنهاد</span></h3>
+    <div class="grid">
+      <div class="mini"><b>✅ از PNG استفاده کنید</b>بهترین فرمت برای مخفی‌سازی بدون افت کیفیت و بدون خطر خرابی.</div>
+      <div class="mini"><b>✅ رمز عبور قوی بگذارید</b>لایه امنیتی اضافه حتی اگر مکانیزم مخفی‌سازی کشف شود.</div>
+      <div class="mini"><b>✅ فایل حامل را تغییر ندهید</b>هرگونه ویرایش، فشرده‌سازی یا تغییر پسوند ممکن است داده را خراب کند.</div>
+      <div class="mini"><b>❌ از JPEG استفاده نکنید</b>فرمت Lossy است و ممکن است داده مخفی شده را از بین ببرد.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".9"/></svg></span>
+    <h2>عیب‌یابی و سؤالات متداول<small>۹۰٪ مشکلات یکی از این‌هاست</small></h2>
+  </div>
+
+  <div class="card"><div class="tbl-wrap"><table>
+    <tr><th>نشانه</th><th>علت احتمالی</th><th>راه‌حل</th></tr>
+    <tr>
+      <td>خطا در استخراج: «پسورد اشتباه یا فایل خراب»</td>
+      <td>رمز عبور اشتباه یا فایل حامل ویرایش/فشرده شده</td>
+      <td>رمز را دوباره بررسی کنید. مطمئن شوید فایل حامل تغییر نکرده.</td>
+    </tr>
+    <tr>
+      <td>خطا: «فایل خراب است»</td>
+      <td>فایل حامل با فشرده‌سازی یا ویرایش آسیب دیده</td>
+      <td>از نسخه اصلی فایل حامل استفاده کنید. از PNG استفاده کنید.</td>
+    </tr>
+    <tr>
+      <td>ظرفیت کافی نیست</td>
+      <td>فایل حامل کوچک‌تر از فایل مخفی شونده است</td>
+      <td>فایل حامل بزرگ‌تر انتخاب کنید یا فایل مخفی شونده را فشرده کنید.</td>
+    </tr>
+    <tr>
+      <td>فایل خروجی باز نمی‌شود</td>
+      <td>فرمت فایل خروجی با اپلیکیشن پیش‌فرض سازگار نیست</td>
+      <td>فایل را با اپلیکیشن مناسب باز کنید (مثلاً PNG با نمایشگر تصویر).</td>
+    </tr>
+    <tr>
+      <td>«پسورد خالی است»</td>
+      <td>فیلد رمز عبور خالی گذاشته شده</td>
+      <td>یا رمز وارد کنید، یا فیلد را خالی رها کنید (بدون رمزنگاری).</td>
+    </tr>
+    <tr>
+      <td>نام فایل نمایش داده نمی‌شود</td>
+      <td>فایل با نسخه قدیمی‌تر (V1) مخفی شده</td>
+      <td>نام فایل استخراج شده «recovered_file» خواهد بود. طبیعی است.</td>
+    </tr>
+  </table></div></div>
+
+  <div class="card">
+    <h3>مقایسه با ابزارهای مشابه</h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>ویژگی</th><th>StegaSuite</th><th>ابزارهای مشابه</th></tr>
+      <tr><td>رمزنگاری</td><td><b>AES-256-GCM</b></td><td>معمولاً AES-128 یا بدون رمزنگاری</td></tr>
+      <tr><td>فرمت‌های حامل</td><td><b>۳۰+ فرمت</b></td><td>عمدتاً PNG/JPEG</td></tr>
+      <tr><td>تشخیص فرمت</td><td><b>خودکار با Magic Bytes</b></td><td>دستی یا فقط پسوند</td></tr>
+      <tr><td>رابط کاربری</td><td><b>فارسی و انگلیسی</b></td><td>عمدتاً انگلیسی</td></tr>
+      <tr><td>متن‌باز</td><td><b>بله</b></td><td>معمولاً خیر</td></tr>
+      <tr><td>پشتیبانی V1/V2</td><td><b>backward compatible</b></td><td>معمولاً خیر</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ================= ADVANCED ================= -->
+<section id="advanced">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+    <h2>نکات پیشرفته<small>برای کاربران حرفه‌ای</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>نسخه‌های فرمت <span class="tag info">فناوری</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>نسخه</th><th>Magic</th><th>ویژگی</th></tr>
+      <tr><td><b>V1 Legacy</b></td><td dir="ltr">SGP1</td><td>بدون ذخیره نام فایل — نام خروجی: «recovered_file»</td></tr>
+      <tr><td><b>V2 Current</b></td><td dir="ltr">SGP2</td><td>شامل نام فایل اصلی UTF-8</td></tr>
+      <tr><td><b>File V1</b></td><td dir="ltr">SGF1</td><td>مخفی‌سازی عمومی فایل‌ها (غیرتصویری)</td></tr>
+      <tr><td><b>Audio V1</b></td><td dir="ltr">SGA1</td><td>مخفی‌سازی در فایل‌های صوتی WAV</td></tr>
+    </table></div>
+    <div class="note info"><b>💡 سازگاری معکوس</b>نسخه جدید قادر به استخراج فایل‌های V1 قدیمی است. اما نسخه قدیمی قادر به استخراج فایل‌های V2 جدید نیست.</div>
+  </div>
+
+  <div class="card">
+    <h3>ساختار بیتی LSB <span class="tag">فناوری</span></h3>
+    <div class="code"><header><span>LSB Encoding</span></header><pre>
+Original pixel:  R=10110100  G=11001011  B=01101010
+                                        ↑       ↑       ↑
+LSB hidden:      R=1011010**0** G=1100101**1** B=0110101**0**
+                                         ↑       ↑       ↑
+                                         └───────┴───────┘
+                                         3 bits per pixel
+                                         تغییر رنگ: حداکثر 1/255
+
+Capacity: width × height × 3 bits ÷ 8 = bytes</pre></div>
+  </div>
+</section>
+
+<footer>
+  ساخته‌شده برای پروژه StegaSuite — طراحی توسط alvandcode
+  <div class="links">
+    <a href="https://github.com/Alvandcode/StegaSuite" target="_blank" rel="noopener">⭐ گیت‌هاب پروژه</a>
+    <a href="https://github.com/Alvandcode/StegaSuite/releases" target="_blank" rel="noopener">⬇️ دانلود APK</a>
+  </div>
+  <br><a class="top" href="#top">بازگشت به بالا</a>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  // Copy buttons
+  document.querySelectorAll('.code').forEach(function(box){
+    var btn = box.querySelector('.copy'), pre = box.querySelector('pre');
+    if(!btn || !pre) return;
+    btn.addEventListener('click', function(){
+      var txt = pre.innerText;
+      function done(){ btn.textContent = 'کپی شد ✓'; setTimeout(function(){ btn.textContent = 'کپی'; }, 1500); }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(done).catch(function(){ fallback(); });
+      } else { fallback(); }
+      function fallback(){
+        var ta = document.createElement('textarea');
+        ta.value = txt; document.body.appendChild(ta); ta.select();
+        try{ document.execCommand('copy'); }catch(e){}
+        document.body.removeChild(ta); done();
+      }
+    });
+  });
+  // Active nav highlight
+  var links = Array.prototype.slice.call(document.querySelectorAll('#navlinks a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var ids = Object.keys(map);
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        links.forEach(function(a){ a.classList.remove('active'); });
+        var a = map[en.target.id]; if(a) a.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  ids.forEach(function(id){
+    var el = document.getElementById(id); if(el) obs.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
