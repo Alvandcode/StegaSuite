@@ -166,6 +166,7 @@ class MainActivity : ComponentActivity() {
                 var lastSavedName by remember { mutableStateOf("") }
                 var pendingHide by remember { mutableStateOf<Triple<ByteArray, Uri, String>?>(null) }
                 var pendingExtract by remember { mutableStateOf<Pair<Uri, String>?>(null) }
+                var pendingExtractResult by remember { mutableStateOf<Pair<ByteArray, String>?>(null) }
 
                 fun getName(u: Uri): String {
                     var n = "file"
@@ -269,35 +270,17 @@ class MainActivity : ComponentActivity() {
                 }
 
                 val saveFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
-                    val p = pendingExtract ?: return@rememberLauncherForActivityResult
-                    if (uri == null) { busy = false; pendingExtract = null; return@rememberLauncherForActivityResult }
+                    val result = pendingExtractResult ?: return@rememberLauncherForActivityResult
+                    if (uri == null) { busy = false; pendingExtractResult = null; return@rememberLauncherForActivityResult }
                     lifecycleScope.launch {
                         try {
-                            status = t["extracting"]!!
-                            val carrierBytes = withContext(Dispatchers.IO) {
-                                ctx.contentResolver.openInputStream(p.first)?.use { it.readBytes() } ?: error("file read error")
-                            }
-                            val ex = withContext(Dispatchers.IO) {
-                                val magicPng = carrierBytes.size >= 4 && carrierBytes[0] == 0x89.toByte() && carrierBytes[1] == 0x50.toByte()
-                                val magicBmp = carrierBytes.size >= 2 && carrierBytes[0] == 0x42.toByte() && carrierBytes[1] == 0x4D.toByte()
-                                if (magicPng || magicBmp) {
-                                    val bmp = BitmapFactory.decodeByteArray(carrierBytes, 0, carrierBytes.size)
-                                    if (bmp != null) {
-                                        PngSteganography.extract(bmp, p.second.ifEmpty { null }).also { bmp.recycle() }
-                                    } else {
-                                        PngSteganography.extractGeneric(carrierBytes, p.second.ifEmpty { null }, PngSteganography.detectCarrierType(getName(p.first), carrierBytes))
-                                    }
-                                } else {
-                                    PngSteganography.extractGeneric(carrierBytes, p.second.ifEmpty { null }, PngSteganography.detectCarrierType(getName(p.first), carrierBytes))
-                                }
-                            }
-                            withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)?.use { it.write(ex.bytes) } }
-                            lastSavedUri = uri; lastSavedName = ex.fileName
-                            status = "${t["extracted"]}: ${ex.fileName}"
+                            withContext(Dispatchers.IO) { ctx.contentResolver.openOutputStream(uri)?.use { it.write(result.first) } }
+                            lastSavedUri = uri; lastSavedName = result.second
+                            status = "${t["extracted"]}: ${result.second}"
                         } catch (e: Exception) {
                             status = "${t["error"]}: ${e.message}"
                         } finally {
-                            busy = false; pendingExtract = null
+                            busy = false; pendingExtractResult = null
                         }
                     }
                 }
@@ -576,8 +559,33 @@ class MainActivity : ComponentActivity() {
                                 pendingHide = Triple(carrierData!!, payloadUri!!, pass)
                                 saveCarrier.launch(toStName(getName(carrierUri!!)))
                             } else {
-                                pendingExtract = Pair(carrierUri!!, pass)
-                                saveFile.launch("recovered_file")
+                                lifecycleScope.launch {
+                                    try {
+                                        status = t["extracting"]!!
+                                        val carrierBytes = withContext(Dispatchers.IO) {
+                                            ctx.contentResolver.openInputStream(carrierUri!!)?.use { it.readBytes() } ?: error("file read error")
+                                        }
+                                        val ex = withContext(Dispatchers.IO) {
+                                            val magicPng = carrierBytes.size >= 4 && carrierBytes[0] == 0x89.toByte() && carrierBytes[1] == 0x50.toByte()
+                                            val magicBmp = carrierBytes.size >= 2 && carrierBytes[0] == 0x42.toByte() && carrierBytes[1] == 0x4D.toByte()
+                                            if (magicPng || magicBmp) {
+                                                val bmp = BitmapFactory.decodeByteArray(carrierBytes, 0, carrierBytes.size)
+                                                if (bmp != null) {
+                                                    PngSteganography.extract(bmp, pass.ifEmpty { null }).also { bmp.recycle() }
+                                                } else {
+                                                    PngSteganography.extractGeneric(carrierBytes, pass.ifEmpty { null }, PngSteganography.detectCarrierType(getName(carrierUri!!), carrierBytes))
+                                                }
+                                            } else {
+                                                PngSteganography.extractGeneric(carrierBytes, pass.ifEmpty { null }, PngSteganography.detectCarrierType(getName(carrierUri!!), carrierBytes))
+                                            }
+                                        }
+                                        pendingExtractResult = Pair(ex.bytes, ex.fileName)
+                                        saveFile.launch(ex.fileName)
+                                    } catch (e: Exception) {
+                                        status = "${t["error"]}: ${e.message}"
+                                        busy = false
+                                    }
+                                }
                             }
                         },
                         modifier = Modifier
