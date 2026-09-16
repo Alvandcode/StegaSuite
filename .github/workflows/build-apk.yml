@@ -35,11 +35,35 @@ jobs:
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
 
+      - name: Cache keystore
+        id: cache-keystore
+        uses: actions/cache@v4
+        with:
+          path: keystore/stegasuite.jks
+          key: release-keystore-v2
+
+      - name: Generate keystore if not cached
+        if: steps.cache-keystore.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p keystore
+          keytool -genkeypair -v \
+            -keystore keystore/stegasuite.jks \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -alias stegasuite \
+            -storepass stegasuite123 \
+            -keypass stegasuite123 \
+            -dname "CN=Alvandcode, OU=Dev, O=StegaSuite, L=Tehran, ST=Iran, C=IR"
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build Debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
+        env:
+          KEYSTORE_FILE: keystore/stegasuite.jks
+          KEYSTORE_PASSWORD: stegasuite123
+          KEY_ALIAS: stegasuite
+          KEY_PASSWORD: stegasuite123
 
       - name: List APK
         run: ls -lh app/build/outputs/apk/debug/
