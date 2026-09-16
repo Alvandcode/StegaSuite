@@ -39,7 +39,7 @@ object FileSteganography {
 
         val packet = MAGIC + ByteBuffer.allocate(8).putLong(encryptedPayload.size.toLong()).array() + encryptedPayload
         val safeStart = getSafeOffset(carrierData)
-        val capacityBits = (carrierData.size.toLong() - safeStart)
+        val capacityBits = (carrierData.size.toLong() - safeStart) * 8L
         require(packet.size.toLong() * 8L <= capacityBits) {
             "File too large! Capacity: ${capacityBytes(carrierData)/1024}KB, Needed: ${packet.size/1024}KB"
         }

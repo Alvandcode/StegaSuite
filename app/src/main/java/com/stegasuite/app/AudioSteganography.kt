@@ -136,7 +136,7 @@ object AudioSteganography {
         val magic = bitsToBytes(magicBits)
         require(magic.contentEquals(MAGIC)) { "No hidden file found in this audio" }
 
-        val headerBits = sampleBits.subList(HEADER_SIZE * 8, HEADER_SIZE * 8 + HEADER_SIZE * 8).toIntArray()
+        val headerBits = sampleBits.subList(0, HEADER_SIZE * 8).toIntArray()
         val head = bitsToBytes(headerBits)
         val len = ByteBuffer.wrap(head.copyOfRange(4, 12)).long
         require(len >= 0 && len <= 50L * 1024 * 1024) { "Suspicious length" }
