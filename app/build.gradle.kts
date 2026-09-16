@@ -10,10 +10,12 @@ android {
 
     defaultConfig {
         applicationId = "com.stegasuite.app"
-        // ورژن خودکار: روی گیت‌هاب هر بیلد +1 میشه تا نیاز به حذف نباشه
-        val runNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
-        versionCode = 10 + runNumber // 10,11,12... همیشه بزرگتر از قبلی
-        versionName = "1.1.${runNumber}"
+        // ورژن خودکار: روی گیت‌هاب هر بیلد +1 میشه، locally از تایم‌スタンپ استفاده میشه
+        val runNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull()
+        val localTimestamp = (System.currentTimeMillis() / 1000 % 100000).toInt()
+        val buildNumber = runNumber ?: (10000 + localTimestamp)
+        versionCode = buildNumber
+        versionName = if (runNumber != null) "1.1.${runNumber}" else "1.1.local.${localTimestamp}"
         minSdk = 26
         targetSdk = 35
     }
