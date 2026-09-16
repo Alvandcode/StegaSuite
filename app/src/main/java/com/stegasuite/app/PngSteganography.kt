@@ -106,9 +106,17 @@ object PngSteganography {
             if (bitIndex >= totalBits) break
             val c = pixels[i]
             val a = c and -0x1000000
+            val alphaVal = (a shr 24) and 0xFF
             var r = (c shr 16) and 255
             var g = (c shr 8) and 255
             var b = c and 255
+
+            if (alphaVal != 0 && alphaVal != 255) {
+                r = (r * 255 + alphaVal / 2) / alphaVal
+                g = (g * 255 + alphaVal / 2) / alphaVal
+                b = (b * 255 + alphaVal / 2) / alphaVal
+            }
+
             val channels = intArrayOf(r, g, b)
             for (ch in 0..2) {
                 if (bitIndex >= totalBits) break
@@ -116,6 +124,12 @@ object PngSteganography {
                 val bit = (byteVal shr (7 - (bitIndex % 8))) and 1
                 channels[ch] = (channels[ch] and 0xFE) or bit
                 bitIndex++
+            }
+
+            if (alphaVal != 0 && alphaVal != 255) {
+                channels[0] = (channels[0] * alphaVal + 127) / 255
+                channels[1] = (channels[1] * alphaVal + 127) / 255
+                channels[2] = (channels[2] * alphaVal + 127) / 255
             }
             pixels[i] = a or (channels[0] shl 16) or (channels[1] shl 8) or channels[2]
         }
