@@ -19,6 +19,8 @@
 
 .Hide any file inside any carrier · AES-256-GCM encryption · 30+ formats · Bilingual UI
 
+[📖 **آموزش کامل استفاده از StegaSuite**](https://alvandcode.github.io/StegaSuite/tutorial.html)
+
 </div>
 
 ---
