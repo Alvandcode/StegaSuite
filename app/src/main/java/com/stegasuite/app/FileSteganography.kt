@@ -48,7 +48,8 @@ object FileSteganography {
         var bitIndex = 0
         val totalBits = packet.size * 8
 
-        for (i in safeStart until out.size) {
+        val start = safeStart.toInt()
+        for (i in start until out.size) {
             if (bitIndex >= totalBits) break
             val byteVal = out[i].toInt() and 255
             val dataBit = (packet[bitIndex / 8].toInt() and 255 shr (7 - (bitIndex % 8))) and 1
