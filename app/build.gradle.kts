@@ -10,7 +10,6 @@ android {
 
     defaultConfig {
         applicationId = "com.stegasuite.app"
-        // ورژن خودکار: روی گیت‌هاب هر بیلد +1 میشه، locally از تایم‌スタンپ استفاده میشه
         val runNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull()
         val localTimestamp = (System.currentTimeMillis() / 1000 % 100000).toInt()
         val buildNumber = runNumber ?: (10000 + localTimestamp)
@@ -22,40 +21,21 @@ android {
 
     signingConfigs {
         create("release") {
-            val ksPath = System.getenv("KEYSTORE_FILE")
-            val ksPass = System.getenv("KEYSTORE_PASSWORD")
-            val ksAlias = System.getenv("KEY_ALIAS")
-            val ksKeyPass = System.getenv("KEY_PASSWORD")
-            if (ksPath != null && ksPass != null && ksAlias != null && ksKeyPass != null) {
-                val ksFile = file(ksPath)
-                if (ksFile.exists()) {
-                    storeFile = ksFile
-                    storePassword = ksPass
-                    keyAlias = ksAlias
-                    keyPassword = ksKeyPass
-                }
-            }
+            storeFile = file("release.jks")
+            storePassword = "stegasuite123"
+            keyAlias = "stegasuite"
+            keyPassword = "stegasuite123"
         }
     }
 
     buildTypes {
         release {
-            if (signingConfigs.names.contains("release")) {
-                val ksFile = signingConfigs.getByName("release").storeFile
-                if (ksFile != null && ksFile.exists()) {
-                    signingConfig = signingConfigs.getByName("release")
-                }
-            }
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
         }
         debug {
-            if (signingConfigs.names.contains("release")) {
-                val ksFile = signingConfigs.getByName("release").storeFile
-                if (ksFile != null && ksFile.exists()) {
-                    signingConfig = signingConfigs.getByName("release")
-                }
-            }
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
         }
@@ -67,8 +47,6 @@ android {
     }
 
     buildFeatures { compose = true }
-
-    // APK naming handled in CI workflow
 }
 
 kotlin { jvmToolchain(17) }

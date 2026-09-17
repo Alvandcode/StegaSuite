@@ -39,15 +39,14 @@ jobs:
         id: cache-keystore
         uses: actions/cache@v4
         with:
-          path: keystore/stegasuite.jks
-          key: release-keystore-v2
+          path: app/release.jks
+          key: release-keystore-v3
 
       - name: Generate keystore if not cached
         if: steps.cache-keystore.outputs.cache-hit != 'true'
         run: |
-          mkdir -p keystore
           keytool -genkeypair -v \
-            -keystore keystore/stegasuite.jks \
+            -keystore app/release.jks \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -alias stegasuite \
             -storepass stegasuite123 \
@@ -68,11 +67,6 @@ jobs:
 
       - name: Build Debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
-        env:
-          KEYSTORE_FILE: keystore/stegasuite.jks
-          KEYSTORE_PASSWORD: stegasuite123
-          KEY_ALIAS: stegasuite
-          KEY_PASSWORD: stegasuite123
 
       - name: Rename APK
         run: |
@@ -80,27 +74,41 @@ jobs:
           cp app/build/outputs/apk/debug/app-debug.apk "release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
           ls -lh release/
 
+      - name: Re-sign APK with apksigner (guarantee valid signature)
+        run: |
+          APK="release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
+          KEYSTORE="app/release.jks"
+          TMP_APK="/tmp/rebuild.apk"
+          # Zipalign first
+          $ANDROID_HOME/build-tools/35.0.0/zipalign -f 4 "$APK" "$TMP_APK"
+          # Re-sign with apksigner directly (bypasses Gradle signing)
+          $ANDROID_HOME/build-tools/35.0.0/apksigner sign \
+            --ks "$KEYSTORE" \
+            --ks-key-alias stegasuite \
+            --ks-pass pass:stegasuite123 \
+            --key-pass pass:stegasuite123 \
+            "$TMP_APK"
+          mv "$TMP_APK" "$APK"
+          echo "Re-signed APK successfully"
+
       - name: Verify APK Signature
         run: |
           APK_FILE="release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
           echo "=== APK Info ==="
           ls -lh "$APK_FILE"
           file "$APK_FILE"
-          echo "=== ZIP Contents ==="
-          unzip -l "$APK_FILE" | head -5
           echo "=== Signature ==="
           $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose "$APK_FILE"
+          # Print signing key hash for consistency check
+          echo "=== Signing Key Hash ==="
+          $ANDROID_HOME/build-tools/35.0.0/apksigner verify --print-certs "$APK_FILE" | grep "SHA-256"
 
       - name: Verify APK is installable
         run: |
           APK="release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
-          # Check APK has valid ZIP structure
           unzip -t "$APK" > /dev/null 2>&1 && echo "Valid ZIP structure" || echo "INVALID ZIP"
-          # Check AndroidManifest.xml exists
           unzip -l "$APK" | grep -q "AndroidManifest.xml" && echo "Has AndroidManifest.xml" || echo "MISSING MANIFEST"
-          # Check classes.dex exists
           unzip -l "$APK" | grep -q "classes.dex" && echo "Has classes.dex" || echo "MISSING DEX"
-          # Check signing
           $ANDROID_HOME/build-tools/35.0.0/apksigner verify "$APK" && echo "APK is properly signed" || echo "APK NOT SIGNED"
           echo "=== All checks passed ==="
 
