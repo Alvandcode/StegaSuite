@@ -94,7 +94,8 @@ private val tr = mapOf(
         "contactTitle" to "تماس با ما", "contactGithub" to "GitHub", "contactTelegram" to "کانال تلگرام",
         "contactWebsite" to "وبسایت",
         "mode" to "حالت", "carrierInfo" to "اطلاعات فایل حامل", "capacity" to "ظرفیت",
-        "fileName" to "نام فایل", "size" to "حجم"
+        "fileName" to "نام فایل", "size" to "حجم",
+        "navHome" to "خانه", "navSettings" to "تنظیمات", "navAbout" to "درباره", "navSupport" to "حمایت", "navContact" to "تماس"
     ),
     "ar" to mapOf(
         "title" to "ستيغاسويت", "subtitle" to "إخفاء الملفات بأمان",
@@ -121,7 +122,8 @@ private val tr = mapOf(
         "contactTitle" to "اتصل بنا", "contactGithub" to "GitHub", "contactTelegram" to "قناة تيليجرام",
         "contactWebsite" to "الموقع الإلكتروني",
         "mode" to "الوضع", "carrierInfo" to "معلومات الحامل", "capacity" to "السعة",
-        "fileName" to "اسم الملف", "size" to "الحجم"
+        "fileName" to "اسم الملف", "size" to "الحجم",
+        "navHome" to "الرئيسية", "navSettings" to "الإعدادات", "navAbout" to "حول", "navSupport" to "الدعم", "navContact" to "اتصال"
     ),
     "en" to mapOf(
         "title" to "StegaSuite", "subtitle" to "Secure File Steganography",
@@ -148,7 +150,8 @@ private val tr = mapOf(
         "contactTitle" to "Contact Us", "contactGithub" to "GitHub", "contactTelegram" to "Telegram Channel",
         "contactWebsite" to "Website",
         "mode" to "Mode", "carrierInfo" to "Carrier Info", "capacity" to "Capacity",
-        "fileName" to "File Name", "size" to "Size"
+        "fileName" to "File Name", "size" to "Size",
+        "navHome" to "Home", "navSettings" to "Settings", "navAbout" to "About", "navSupport" to "Support", "navContact" to "Contact"
     ),
     "ru" to mapOf(
         "title" to "StegaSuite", "subtitle" to "Безопасная стеганография файлов",
@@ -175,7 +178,8 @@ private val tr = mapOf(
         "contactTitle" to "Связаться с нами", "contactGithub" to "GitHub", "contactTelegram" to "Канал Telegram",
         "contactWebsite" to "Сайт",
         "mode" to "Режим", "carrierInfo" to "Информация о носителе", "capacity" to "Ёмкость",
-        "fileName" to "Имя файла", "size" to "Размер"
+        "fileName" to "Имя файла", "size" to "Размер",
+        "navHome" to "Главная", "navSettings" to "Настройки", "navAbout" to "О нас", "navSupport" to "Поддержка", "navContact" to "Контакты"
     ),
     "zh" to mapOf(
         "title" to "StegaSuite", "subtitle" to "安全文件隐写术",
@@ -202,7 +206,8 @@ private val tr = mapOf(
         "contactTitle" to "联系我们", "contactGithub" to "GitHub", "contactTelegram" to "Telegram 频道",
         "contactWebsite" to "网站",
         "mode" to "模式", "carrierInfo" to "载体信息", "capacity" to "容量",
-        "fileName" to "文件名", "size" to "大小"
+        "fileName" to "文件名", "size" to "大小",
+        "navHome" to "首页", "navSettings" to "设置", "navAbout" to "关于", "navSupport" to "支持", "navContact" to "联系"
     )
 )
 
@@ -229,6 +234,7 @@ class MainActivity : ComponentActivity() {
         val t = tr[lang]!!
         val dir = if (lang in rtlLangs) LayoutDirection.Rtl else LayoutDirection.Ltr
         var currentPage by remember { mutableStateOf("main") }
+        var menuExpanded by remember { mutableStateOf(false) }
 
         CompositionLocalProvider(LocalLayoutDirection provides dir) {
             Surface(modifier = Modifier.fillMaxSize(), color = theme.bg) {
@@ -250,19 +256,28 @@ class MainActivity : ComponentActivity() {
                             fontSize = 22.sp,
                             modifier = Modifier.clickable { currentPage = "main" }
                         )
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            listOf(
-                                Triple("settings", "تنظیمات", Icons.Default.Settings),
-                                Triple("about", "درباره", Icons.Default.Info),
-                                Triple("support", "حمایت", Icons.Default.Favorite),
-                                Triple("contact", "تماس", Icons.Default.Email)
-                            ).forEach { (page, _, icon) ->
-                                Box(
-                                    Modifier.clip(RoundedCornerShape(10.dp)).background(theme.cardBg)
-                                        .clickable { currentPage = page }.padding(8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(icon, contentDescription = null, tint = theme.accent, modifier = Modifier.size(18.dp))
+                        Box {
+                            IconButton(onClick = { menuExpanded = true }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = null, tint = theme.text, modifier = Modifier.size(24.dp))
+                            }
+                            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                                DropdownMenuItem(
+                                    text = { Text(t["navHome"] ?: "خانه", color = theme.text) },
+                                    leadingIcon = { Icon(Icons.Default.Home, contentDescription = null, tint = theme.accent) },
+                                    onClick = { currentPage = "main"; menuExpanded = false }
+                                )
+                                HorizontalDivider(color = theme.cardBorder)
+                                listOf(
+                                    Triple("settings", t["navSettings"] ?: "تنظیمات", Icons.Default.Settings),
+                                    Triple("about", t["navAbout"] ?: "درباره", Icons.Default.Info),
+                                    Triple("support", t["navSupport"] ?: "حمایت", Icons.Default.Favorite),
+                                    Triple("contact", t["navContact"] ?: "تماس", Icons.Default.Email)
+                                ).forEach { (page, label, icon) ->
+                                    DropdownMenuItem(
+                                        text = { Text(label, color = theme.text) },
+                                        leadingIcon = { Icon(icon, contentDescription = null, tint = theme.accent) },
+                                        onClick = { currentPage = page; menuExpanded = false }
+                                    )
                                 }
                             }
                         }
