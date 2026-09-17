@@ -67,29 +67,12 @@ jobs:
           echo "version=1.2.0.${RUN_NUM}" >> $GITHUB_OUTPUT
 
       - name: Build Debug APK
-        id: build
-        run: gradle assembleDebug --no-daemon --stacktrace 2>&1 | tail -200 > build-error.log; exit ${PIPESTATUS[0]}
+        run: gradle assembleDebug --no-daemon --stacktrace
         env:
           KEYSTORE_FILE: keystore/stegasuite.jks
           KEYSTORE_PASSWORD: stegasuite123
           KEY_ALIAS: stegasuite
           KEY_PASSWORD: stegasuite123
-        continue-on-error: true
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build-error.log
-          if-no-files-found: warn
-
-      - name: Fail if build failed
-        if: steps.build.outcome == 'failure'
-        run: |
-          echo "BUILD FAILED - check build-log artifact for details"
-          cat build-error.log
-          exit 1
 
       - name: Rename APK
         run: |
