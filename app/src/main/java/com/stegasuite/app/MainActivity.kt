@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,6 +69,10 @@ private val AccentPink = Color(0xFFE91E63)
 private val AccentGradientStart = Color(0xFFAB47BC)
 private val AccentGradientEnd = Color(0xFFE91E63)
 
+private val languages = listOf("fa", "ar", "en", "ru", "zh")
+private val langLabels = mapOf("fa" to "فا", "ar" to "ع", "en" to "EN", "ru" to "РУ", "zh" to "中")
+private val rtlLangs = setOf("fa", "ar")
+
 private val fa = mapOf(
     "title" to "استگانوسویت",
     "subtitle" to "مخفی‌سازی امن فایل‌ها",
@@ -86,7 +91,7 @@ private val fa = mapOf(
     "saved" to "ذخیره شد",
     "extracted" to "استخراج شد",
     "error" to "خطا",
-    "supported" to "همه فرمت‌ها پشتیبانی می‌شوند",
+    "supported" to "همه فرمت‌ها: متن، عکس، صوت، ویدیو، PDF, ZIP...",
     "warning" to "فرمت‌های فشرده ممکنه داده رو خراب کنن",
     "copyright" to "طراحی و اجرا توسط alvandcode",
     "contact" to "ارتباط با سازنده",
@@ -95,6 +100,34 @@ private val fa = mapOf(
     "capacity" to "ظرفیت",
     "fileName" to "نام فایل",
     "size" to "حجم"
+)
+private val ar = mapOf(
+    "title" to "ستيغاسويت",
+    "subtitle" to "إخفاء الملفات بأمان",
+    "hide" to "إخفاء",
+    "extract" to "استخراج",
+    "selectCarrier" to "اختر ملف الحامل",
+    "selectFile" to "اختر الملف المخفي",
+    "password" to "كلمة المرور",
+    "passwordHint" to "اختياري - للتشفير",
+    "hideBtn" to "إخفاء وحفظ",
+    "extBtn" to "استخراج الملف المخفي",
+    "status" to "الحالة",
+    "ready" to "جاهز",
+    "hiding" to "جارٍ الإخفاء...",
+    "extracting" to "جارٍ الاستخراج...",
+    "saved" to "تم الحفظ",
+    "extracted" to "تم الاستخراج",
+    "error" to "خطأ",
+    "supported" to "جميع التنسيقات: نص، صورة، صوت، فيديو، PDF, ZIP...",
+    "warning" to "التنسيقات المضغوطة قد تُتلف البيانات",
+    "copyright" to "تصميم بواسطة alvandcode",
+    "contact" to "التواصل مع المطور",
+    "mode" to "الوضع",
+    "carrierInfo" to "معلومات الحامل",
+    "capacity" to "السعة",
+    "fileName" to "اسم الملف",
+    "size" to "الحجم"
 )
 private val en = mapOf(
     "title" to "StegaSuite",
@@ -114,7 +147,7 @@ private val en = mapOf(
     "saved" to "Saved",
     "extracted" to "Extracted",
     "error" to "Error",
-    "supported" to "All formats supported",
+    "supported" to "All formats: text, images, audio, video, PDF, ZIP...",
     "warning" to "Lossy formats may corrupt data",
     "copyright" to "Designed by alvandcode",
     "contact" to "Contact Developer",
@@ -124,6 +157,63 @@ private val en = mapOf(
     "fileName" to "File Name",
     "size" to "Size"
 )
+private val ru = mapOf(
+    "title" to "StegaSuite",
+    "subtitle" to "Безопасная стеганография файлов",
+    "hide" to "Скрыть",
+    "extract" to "Извлечь",
+    "selectCarrier" to "Выберите файл-носитель",
+    "selectFile" to "Выберите файл для скрытия",
+    "password" to "Пароль",
+    "passwordHint" to "Необязательно - для шифрования",
+    "hideBtn" to "Скрыть и сохранить",
+    "extBtn" to "Извлечь скрытый файл",
+    "status" to "Статус",
+    "ready" to "Готово",
+    "hiding" to "Скрытие...",
+    "extracting" to "Извлечение...",
+    "saved" to "Сохранено",
+    "extracted" to "Извлечено",
+    "error" to "Ошибка",
+    "supported" to "Все форматы: текст, изображения, аудио, видео, PDF, ZIP...",
+    "warning" to "Сжатые форматы могут повредить данные",
+    "copyright" to "Разработано alvandcode",
+    "contact" to "Связаться с разработчиком",
+    "mode" to "Режим",
+    "carrierInfo" to "Информация о носителе",
+    "capacity" to "Ёмкость",
+    "fileName" to "Имя файла",
+    "size" to "Размер"
+)
+private val zh = mapOf(
+    "title" to "StegaSuite",
+    "subtitle" to "安全文件隐写术",
+    "hide" to "隐藏",
+    "extract" to "提取",
+    "selectCarrier" to "选择载体文件",
+    "selectFile" to "选择要隐藏的文件",
+    "password" to "密码",
+    "passwordHint" to "可选 - 用于加密",
+    "hideBtn" to "隐藏并保存",
+    "extBtn" to "提取隐藏文件",
+    "status" to "状态",
+    "ready" to "就绪",
+    "hiding" to "正在隐藏...",
+    "extracting" to "正在提取...",
+    "saved" to "已保存",
+    "extracted" to "已提取",
+    "error" to "错误",
+    "supported" to "所有格式：文本、图片、音频、视频、PDF、ZIP...",
+    "warning" to "有损格式可能会损坏数据",
+    "copyright" to "由 alvandcode 设计",
+    "contact" to "联系开发者",
+    "mode" to "模式",
+    "carrierInfo" to "载体信息",
+    "capacity" to "容量",
+    "fileName" to "文件名",
+    "size" to "大小"
+)
+private val allTranslations = mapOf("fa" to fa, "ar" to ar, "en" to en, "ru" to ru, "zh" to zh)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(b: Bundle?) {
@@ -134,10 +224,11 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun App() {
         val ctx = LocalContext.current
-        var isFa by remember { mutableStateOf(true) }
+        var langIndex by remember { mutableIntStateOf(0) }
+        val lang = languages[langIndex]
         var isDark by remember { mutableStateOf(true) }
-        val t = if (isFa) fa else en
-        val dir = if (isFa) LayoutDirection.Rtl else LayoutDirection.Ltr
+        val t = allTranslations[lang]!!
+        val dir = if (lang in rtlLangs) LayoutDirection.Rtl else LayoutDirection.Ltr
 
         CompositionLocalProvider(LocalLayoutDirection provides dir) {
             val bgColor = if (isDark) DarkBg else Color(0xFFF5F0FA)
@@ -198,10 +289,20 @@ class MainActivity : ComponentActivity() {
                     return if (dot == -1) "$orig(st)" else orig.substring(0, dot) + "(st)" + orig.substring(dot)
                 }
 
-                fun getCarrierTypeLabel(type: CarrierType): String = when (type) {
-                    CarrierType.PNG, CarrierType.BMP, CarrierType.TIFF, CarrierType.WEBP -> if (isFa) "عکس" else "Image"
-                    CarrierType.WAV -> if (isFa) "صوت" else "Audio"
-                    else -> if (isFa) "فایل" else "File"
+                fun getCarrierTypeLabel(type: CarrierType): String {
+                    val labels = mapOf(
+                        "fa" to mapOf("img" to "عکس", "audio" to "صوت", "file" to "فایل"),
+                        "ar" to mapOf("img" to "صورة", "audio" to "صوت", "file" to "ملف"),
+                        "en" to mapOf("img" to "Image", "audio" to "Audio", "file" to "File"),
+                        "ru" to mapOf("img" to "Изображение", "audio" to "Аудио", "file" to "Файл"),
+                        "zh" to mapOf("img" to "图片", "audio" to "音频", "file" to "文件")
+                    )
+                    val key = when (type) {
+                        CarrierType.PNG, CarrierType.BMP, CarrierType.TIFF, CarrierType.WEBP -> "img"
+                        CarrierType.WAV -> "audio"
+                        else -> "file"
+                    }
+                    return labels[lang]?.get(key) ?: "File"
                 }
 
                 val pickCarrier = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { u ->
@@ -318,11 +419,11 @@ class MainActivity : ComponentActivity() {
                                 Modifier
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(if (isDark) Color.White.copy(0.1f) else Purple50)
-                                    .clickable { isFa = !isFa }
+                                    .clickable { langIndex = (langIndex + 1) % languages.size }
                                     .padding(horizontal = 12.dp, vertical = 8.dp)
                             ) {
                                 Text(
-                                    if (isFa) "EN" else "فا",
+                                    langLabels[lang] ?: lang,
                                     color = if (isDark) Color.White else Purple700,
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 13.sp
@@ -493,7 +594,7 @@ class MainActivity : ComponentActivity() {
                                 }
 
                                 Text(
-                                    if (isFa) "همه فرمت‌ها: متن، عکس، صوت، ویدیو، PDF, ZIP..." else "All formats: text, images, audio, video, PDF, ZIP...",
+                                    allTranslations[lang]?.get("supported") ?: "All formats supported",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = subtextColor
                                 )
