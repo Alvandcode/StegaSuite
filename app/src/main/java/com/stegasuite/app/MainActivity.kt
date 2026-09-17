@@ -220,7 +220,7 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun App() {
+    private fun App() {
         val ctx = LocalContext.current
         var langIndex by remember { mutableIntStateOf(0) }
         val lang = languages[langIndex]
@@ -294,7 +294,7 @@ class MainActivity : ComponentActivity() {
     // ── Main Page (Hide/Extract) ──
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun MainPage(t: Map<String, String>, theme: AppTheme, lang: String, langIndex: Int, setLang: (Int) -> Unit, themeIndex: Int, setTheme: (Int) -> Unit, ctx: android.content.Context) {
+    private fun MainPage(t: Map<String, String>, theme: AppTheme, lang: String, langIndex: Int, setLang: (Int) -> Unit, themeIndex: Int, setTheme: (Int) -> Unit, ctx: android.content.Context) {
         var extractMode by remember { mutableStateOf(false) }
         var carrierUri by remember { mutableStateOf<Uri?>(null) }
         var carrierInfo by remember { mutableStateOf("") }
@@ -436,7 +436,7 @@ class MainActivity : ComponentActivity() {
     // ── Settings Page ──
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun SettingsPage(t: Map<String, String>, theme: AppTheme, lang: String, langIndex: Int, setLang: (Int) -> Unit, themeIndex: Int, setTheme: (Int) -> Unit) {
+    private fun SettingsPage(t: Map<String, String>, theme: AppTheme, lang: String, langIndex: Int, setLang: (Int) -> Unit, themeIndex: Int, setTheme: (Int) -> Unit) {
         var langExpanded by remember { mutableStateOf(false) }
         var themeExpanded by remember { mutableStateOf(false) }
 
@@ -468,7 +468,7 @@ class MainActivity : ComponentActivity() {
 
     // ── About Page ──
     @Composable
-    fun AboutPage(t: Map<String, String>, theme: AppTheme) {
+    private fun AboutPage(t: Map<String, String>, theme: AppTheme) {
         val ctx = LocalContext.current
         Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = theme.cardBg), border = CardDefaults.outlinedCardBorder().copy(brush = Brush.linearGradient(listOf(theme.cardBorder, theme.cardBorder)))) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -491,7 +491,7 @@ class MainActivity : ComponentActivity() {
 
     // ── Support Page ──
     @Composable
-    fun SupportPage(t: Map<String, String>, theme: AppTheme, ctx: android.content.Context) {
+    private fun SupportPage(t: Map<String, String>, theme: AppTheme, ctx: android.content.Context) {
         Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = theme.cardBg), border = CardDefaults.outlinedCardBorder().copy(brush = Brush.linearGradient(listOf(theme.cardBorder, theme.cardBorder)))) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(t["supportTitle"]!!, fontWeight = FontWeight.Bold, color = theme.text, fontSize = 20.sp)
@@ -522,7 +522,7 @@ class MainActivity : ComponentActivity() {
 
     // ── Contact Page ──
     @Composable
-    fun ContactPage(t: Map<String, String>, theme: AppTheme, ctx: android.content.Context) {
+    private fun ContactPage(t: Map<String, String>, theme: AppTheme, ctx: android.content.Context) {
         Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = theme.cardBg), border = CardDefaults.outlinedCardBorder().copy(brush = Brush.linearGradient(listOf(theme.cardBorder, theme.cardBorder)))) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(t["contactTitle"]!!, fontWeight = FontWeight.Bold, color = theme.text, fontSize = 20.sp)
