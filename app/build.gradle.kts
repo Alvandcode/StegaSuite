@@ -38,12 +38,16 @@ android {
             if (ksFile != null && file(ksFile).exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
         debug {
             val ksFile = System.getenv("KEYSTORE_FILE")
             if (ksFile != null && file(ksFile).exists()) {
                 signingConfig = signingConfigs.getByName("release")
             }
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 
