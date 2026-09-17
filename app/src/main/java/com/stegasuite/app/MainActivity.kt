@@ -14,11 +14,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.*
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -273,14 +268,12 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    AnimatedContent(targetState = currentPage, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "page") { page ->
-                        when (page) {
-                            "main" -> MainPage(t, theme, lang, langIndex, { langIndex = it }, themeIndex, { themeIndex = it }, ctx)
-                            "settings" -> SettingsPage(t, theme, lang, langIndex, { langIndex = it }, themeIndex, { themeIndex = it })
-                            "about" -> AboutPage(t, theme)
-                            "support" -> SupportPage(t, theme, ctx)
-                            "contact" -> ContactPage(t, theme, ctx)
-                        }
+                    when (currentPage) {
+                        "main" -> MainPage(t, theme, lang, langIndex, { langIndex = it }, themeIndex, { themeIndex = it }, ctx)
+                        "settings" -> SettingsPage(t, theme, lang, langIndex, { langIndex = it }, themeIndex, { themeIndex = it })
+                        "about" -> AboutPage(t, theme)
+                        "support" -> SupportPage(t, theme, ctx)
+                        "contact" -> ContactPage(t, theme, ctx)
                     }
 
                     // Footer
