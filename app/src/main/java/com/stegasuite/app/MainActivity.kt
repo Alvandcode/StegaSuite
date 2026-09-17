@@ -54,20 +54,51 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private val Purple50 = Color(0xFFF3E5F5)
-private val Purple100 = Color(0xFFE1BEE7)
-private val Purple200 = Color(0xFFCE93D8)
-private val Purple400 = Color(0xFFAB47BC)
-private val Purple500 = Color(0xFF9C27B0)
-private val Purple600 = Color(0xFF8E24AA)
-private val Purple700 = Color(0xFF7B1FA2)
-private val Purple800 = Color(0xFF6A1B9A)
-private val Purple900 = Color(0xFF4A148C)
-private val DarkBg = Color(0xFF1A1025)
-private val CardLight = Color(0xFFFAFAFA)
-private val AccentPink = Color(0xFFE91E63)
-private val AccentGradientStart = Color(0xFFAB47BC)
-private val AccentGradientEnd = Color(0xFFE91E63)
+private data class AppTheme(
+    val bg: Color, val text: Color, val subtext: Color,
+    val cardBg: Color, val cardBorder: Color,
+    val accentStart: Color, val accentEnd: Color, val accent: Color,
+    val label: String, val dark: Boolean
+)
+
+private val themes = listOf(
+    AppTheme(
+        Color(0xFF1A1025), Color.White, Color.White.copy(0.6f),
+        Color.White.copy(0.06f), Color.White.copy(0.08f),
+        Color(0xFFAB47BC), Color(0xFFE91E63), Color(0xFF9C27B0),
+        "بنفش", true
+    ),
+    AppTheme(
+        Color(0xFF0A0E1A), Color.White, Color.White.copy(0.6f),
+        Color.White.copy(0.06f), Color.White.copy(0.08f),
+        Color(0xFF00BCD4), Color(0xFF2196F3), Color(0xFF00ACC1),
+        "آبی", true
+    ),
+    AppTheme(
+        Color(0xFF0F0A0A), Color.White, Color.White.copy(0.6f),
+        Color.White.copy(0.06f), Color.White.copy(0.08f),
+        Color(0xFFFF1744), Color(0xFFFF6D00), Color(0xFFD50000),
+        "قرمز", true
+    ),
+    AppTheme(
+        Color(0xFFFFF0F3), Color(0xFF2D1B2E), Color(0xFF666666),
+        Color.White, Color(0xFFE8D0D8),
+        Color(0xFFE91E63), Color(0xFFFF80AB), Color(0xFFC2185B),
+        "صورتی", false
+    ),
+    AppTheme(
+        Color(0xFFF0FFF4), Color(0xFF1B2D20), Color(0xFF666666),
+        Color.White, Color(0xFFC8E6C9),
+        Color(0xFF26A69A), Color(0xFF80CBC4), Color(0xFF00897B),
+        "سبز", false
+    ),
+    AppTheme(
+        Color(0xFFF3F0FF), Color(0xFF1B1B2D), Color(0xFF666666),
+        Color.White, Color(0xFFD1C4E9),
+        Color(0xFF7C4DFF), Color(0xFFB388FF), Color(0xFF651FFF),
+        "بنفش روشن", false
+    )
+)
 
 private val languages = listOf("fa", "ar", "en", "ru", "zh")
 private val langLabels = mapOf("fa" to "فا", "ar" to "ع", "en" to "EN", "ru" to "РУ", "zh" to "中")
@@ -226,16 +257,17 @@ class MainActivity : ComponentActivity() {
         val ctx = LocalContext.current
         var langIndex by remember { mutableIntStateOf(0) }
         val lang = languages[langIndex]
-        var isDark by remember { mutableStateOf(true) }
+        var themeIndex by remember { mutableIntStateOf(0) }
+        val theme = themes[themeIndex]
         val t = allTranslations[lang]!!
         val dir = if (lang in rtlLangs) LayoutDirection.Rtl else LayoutDirection.Ltr
 
         CompositionLocalProvider(LocalLayoutDirection provides dir) {
-            val bgColor = if (isDark) DarkBg else Color(0xFFF5F0FA)
-            val textColor = if (isDark) Color.White else Color(0xFF1A1025)
-            val subtextColor = if (isDark) Color.White.copy(0.6f) else Color(0xFF666666)
-            val cardBg = if (isDark) Color.White.copy(0.06f) else Color.White
-            val cardBorder = if (isDark) Color.White.copy(0.08f) else Color(0xFFE0E0E0)
+            val bgColor = theme.bg
+            val textColor = theme.text
+            val subtextColor = theme.subtext
+            val cardBg = theme.cardBg
+            val cardBorder = theme.cardBorder
 
             Box(
                 Modifier
@@ -404,7 +436,7 @@ class MainActivity : ComponentActivity() {
                                 t["title"]!!,
                                 style = MaterialTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isDark) Color.White else Purple900,
+                                color = theme.accent,
                                 fontSize = 28.sp
                             )
                             Text(
@@ -418,13 +450,13 @@ class MainActivity : ComponentActivity() {
                             Box(
                                 Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(if (isDark) Color.White.copy(0.1f) else Purple50)
+                                    .background(cardBg)
                                     .clickable { langIndex = (langIndex + 1) % languages.size }
                                     .padding(horizontal = 12.dp, vertical = 8.dp)
                             ) {
                                 Text(
                                     langLabels[lang] ?: lang,
-                                    color = if (isDark) Color.White else Purple700,
+                                    color = theme.accent,
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 13.sp
                                 )
@@ -433,13 +465,15 @@ class MainActivity : ComponentActivity() {
                             Box(
                                 Modifier
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(if (isDark) Color.White.copy(0.1f) else Purple50)
-                                    .clickable { isDark = !isDark }
+                                    .background(cardBg)
+                                    .clickable { themeIndex = (themeIndex + 1) % themes.size }
                                     .padding(horizontal = 12.dp, vertical = 8.dp)
                             ) {
                                 Text(
-                                    if (isDark) "☀️" else "🌙",
-                                    fontSize = 14.sp
+                                    theme.label,
+                                    color = theme.accent,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 12.sp
                                 )
                             }
                         }
@@ -450,7 +484,7 @@ class MainActivity : ComponentActivity() {
                         Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
-                            .background(if (isDark) Color.White.copy(0.06f) else Purple50)
+                            .background(cardBg)
                             .padding(4.dp)
                     ) {
                         Row(Modifier.fillMaxWidth()) {
@@ -459,7 +493,7 @@ class MainActivity : ComponentActivity() {
                                     .weight(1f)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(
-                                        if (!extractMode) Brush.horizontalGradient(listOf(AccentGradientStart, AccentGradientEnd))
+                                        if (!extractMode) Brush.horizontalGradient(listOf(theme.accentStart, theme.accentEnd))
                                         else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent))
                                     )
                                     .clickable { extractMode = false }
@@ -476,7 +510,7 @@ class MainActivity : ComponentActivity() {
                                     .weight(1f)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(
-                                        if (extractMode) Brush.horizontalGradient(listOf(AccentGradientStart, AccentGradientEnd))
+                                        if (extractMode) Brush.horizontalGradient(listOf(theme.accentStart, theme.accentEnd))
                                         else Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent))
                                     )
                                     .clickable { extractMode = true }
@@ -504,7 +538,7 @@ class MainActivity : ComponentActivity() {
                                     Modifier
                                         .size(40.dp)
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(Brush.linearGradient(listOf(Purple600, AccentPink))),
+                                        .background(Brush.linearGradient(listOf(theme.accentStart, theme.accent))),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text("1", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -517,8 +551,8 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (isDark) Color.White.copy(0.08f) else Purple50,
-                                    contentColor = if (isDark) Color.White else Purple700
+                                    containerColor = cardBg,
+                                    contentColor = theme.accent
                                 ),
                                 contentPadding = PaddingValues(vertical = 14.dp)
                             ) {
@@ -566,7 +600,7 @@ class MainActivity : ComponentActivity() {
                                         Modifier
                                             .size(40.dp)
                                             .clip(RoundedCornerShape(12.dp))
-                                            .background(Brush.linearGradient(listOf(Purple400, Purple600))),
+                                            .background(Brush.linearGradient(listOf(theme.accentStart, theme.accentEnd))),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text("2", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -579,8 +613,8 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(14.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isDark) Color.White.copy(0.08f) else Purple50,
-                                        contentColor = if (isDark) Color.White else Purple700
+containerColor = cardBg,
+                                    contentColor = theme.accent
                                     ),
                                     contentPadding = PaddingValues(vertical = 14.dp)
                                 ) {
@@ -615,7 +649,7 @@ class MainActivity : ComponentActivity() {
                                     Modifier
                                         .size(40.dp)
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(Brush.linearGradient(listOf(Purple700, Purple900))),
+                                        .background(Brush.linearGradient(listOf(theme.accentEnd, theme.accent))),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text("🔑", fontSize = 16.sp)
@@ -631,7 +665,7 @@ class MainActivity : ComponentActivity() {
                                 singleLine = true,
                                 shape = RoundedCornerShape(14.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = Purple500,
+                                    focusedBorderColor = theme.accent,
                                     unfocusedBorderColor = cardBorder,
                                     focusedContainerColor = Color.Transparent,
                                     unfocusedContainerColor = Color.Transparent
@@ -694,7 +728,7 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize()
                                 .background(
                                     if (carrierUri != null && !busy)
-                                        Brush.horizontalGradient(listOf(AccentGradientStart, AccentGradientEnd))
+                                        Brush.horizontalGradient(listOf(theme.accentStart, theme.accentEnd))
                                     else
                                         Brush.horizontalGradient(listOf(Color.Gray.copy(0.3f), Color.Gray.copy(0.3f)))
                                 ),
@@ -726,7 +760,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(t["status"]!!, fontWeight = FontWeight.SemiBold, color = textColor, fontSize = 14.sp)
-                            Text(status, color = Purple400, fontSize = 14.sp)
+                            Text(status, color = theme.accent, fontSize = 14.sp)
 
                             if (lastSavedUri != null) {
                                 Spacer(Modifier.height(4.dp))
@@ -734,7 +768,7 @@ class MainActivity : ComponentActivity() {
                                 Spacer(Modifier.height(4.dp))
                                 Text(
                                     lastSavedName,
-                                    color = AccentPink,
+                                    color = theme.accent,
                                     fontWeight = FontWeight.Medium,
                                     modifier = Modifier.clickable {
                                         try {
@@ -767,7 +801,7 @@ class MainActivity : ComponentActivity() {
                         Text(
                             "github.com/Alvandcode",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Purple400,
+                            color = theme.accent,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.clickable {
                                 try {

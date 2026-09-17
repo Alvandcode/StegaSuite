@@ -15,7 +15,7 @@ android {
         val localTimestamp = (System.currentTimeMillis() / 1000 % 100000).toInt()
         val buildNumber = runNumber ?: (10000 + localTimestamp)
         versionCode = buildNumber
-        versionName = if (runNumber != null) "1.1.${runNumber}" else "1.1.local.${localTimestamp}"
+        versionName = if (runNumber != null) "1.2.0.${runNumber}" else "1.2.0.local.${localTimestamp}"
         minSdk = 26
         targetSdk = 35
     }
