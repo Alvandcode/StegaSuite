@@ -375,7 +375,7 @@ class MainActivity : ComponentActivity() {
                     Text(t["selectCarrier"]!!, fontWeight = FontWeight.SemiBold, color = theme.text, fontSize = 16.sp)
                 }
                 Button(onClick = { pickCarrier.launch("*/*") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = theme.cardBg, contentColor = theme.accent), contentPadding = PaddingValues(vertical = 14.dp)) {
-                    if (carrierUri == null) { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t["selectCarrier"]!!, fontWeight = FontWeight.Medium) } else { Text("\u2713 ${getCarrierTypeLabel(carrierType)} \u2022 ${getName(carrierUri!!)}", fontWeight = FontWeight.Medium) }
+                    if (carrierUri == null) { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp), tint = theme.text); Spacer(Modifier.width(8.dp)); Text(t["selectCarrier"]!!, fontWeight = FontWeight.Medium, color = theme.text) } else { Text("\u2713 ${getCarrierTypeLabel(carrierType)} \u2022 ${getName(carrierUri!!)}", fontWeight = FontWeight.Medium, color = theme.text) }
                 }
                 if (carrierInfo.isNotEmpty()) Text(carrierInfo, style = MaterialTheme.typography.bodySmall, color = theme.subtext)
                 if (carrierType == CarrierType.GENERIC && carrierUri != null) {
@@ -395,7 +395,7 @@ class MainActivity : ComponentActivity() {
                         Text(t["selectFile"]!!, fontWeight = FontWeight.SemiBold, color = theme.text, fontSize = 16.sp)
                     }
                     Button(onClick = { pickFile.launch("*/*") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = theme.cardBg, contentColor = theme.accent), contentPadding = PaddingValues(vertical = 14.dp)) {
-                        if (payloadUri == null) { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(t["selectFile"]!!, fontWeight = FontWeight.Medium) } else { Text("\u2713 $payloadInfo", fontWeight = FontWeight.Medium) }
+                        if (payloadUri == null) { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp), tint = theme.text); Spacer(Modifier.width(8.dp)); Text(t["selectFile"]!!, fontWeight = FontWeight.Medium, color = theme.text) } else { Text("\u2713 $payloadInfo", fontWeight = FontWeight.Medium, color = theme.text) }
                     }
                     Text(t["supported"]!!, style = MaterialTheme.typography.bodySmall, color = theme.subtext)
                 }
@@ -409,7 +409,7 @@ class MainActivity : ComponentActivity() {
                     Box(Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(Brush.linearGradient(listOf(theme.accentEnd, theme.accent))), contentAlignment = Alignment.Center) { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp)) }
                     Text(t["password"]!!, fontWeight = FontWeight.SemiBold, color = theme.text, fontSize = 16.sp)
                 }
-                OutlinedTextField(value = pass, onValueChange = { pass = it }, modifier = Modifier.fillMaxWidth(), placeholder = { Text(t["passwordHint"]!!, color = theme.subtext) }, singleLine = true, shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent), visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(), trailingIcon = { IconButton(onClick = { showPass = !showPass }) { Icon(if (showPass) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null, tint = theme.subtext) } })
+                OutlinedTextField(value = pass, onValueChange = { pass = it }, modifier = Modifier.fillMaxWidth(), placeholder = { Text(t["passwordHint"]!!, color = theme.subtext) }, singleLine = true, shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = theme.text, unfocusedTextColor = theme.text, focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent), visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(), trailingIcon = { IconButton(onClick = { showPass = !showPass }) { Icon(if (showPass) Icons.Default.Visibility else Icons.Default.VisibilityOff, contentDescription = null, tint = theme.subtext) } })
             }
         }
 
@@ -449,17 +449,17 @@ class MainActivity : ComponentActivity() {
 
                 // Language Dropdown
                 ExposedDropdownMenuBox(expanded = langExpanded, onExpandedChange = { langExpanded = it }) {
-                    OutlinedTextField(value = langLabels[lang] ?: lang, onValueChange = {}, readOnly = true, label = { Text(t["language"]!!, color = theme.subtext) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(langExpanded) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent))
+                    OutlinedTextField(value = langLabels[lang] ?: lang, onValueChange = {}, readOnly = true, label = { Text(t["language"]!!, color = theme.subtext) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(langExpanded) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = theme.text, unfocusedTextColor = theme.text, focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent))
                     ExposedDropdownMenu(expanded = langExpanded, onDismissRequest = { langExpanded = false }) {
-                        languages.forEachIndexed { idx, code -> DropdownMenuItem(text = { Text(langLabels[code] ?: code) }, onClick = { setLang(idx); langExpanded = false }) }
+                        languages.forEachIndexed { idx, code -> DropdownMenuItem(text = { Text(langLabels[code] ?: code, color = theme.text) }, onClick = { setLang(idx); langExpanded = false }) }
                     }
                 }
 
                 // Theme Dropdown
                 ExposedDropdownMenuBox(expanded = themeExpanded, onExpandedChange = { themeExpanded = it }) {
-                    OutlinedTextField(value = "${theme.label} (${theme.labelEn})", onValueChange = {}, readOnly = true, label = { Text(t["theme"]!!, color = theme.subtext) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(themeExpanded) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent))
+                    OutlinedTextField(value = "${theme.label} (${theme.labelEn})", onValueChange = {}, readOnly = true, label = { Text(t["theme"]!!, color = theme.subtext) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(themeExpanded) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = theme.text, unfocusedTextColor = theme.text, focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent))
                     ExposedDropdownMenu(expanded = themeExpanded, onDismissRequest = { themeExpanded = false }) {
-                        themes.forEachIndexed { idx, th -> DropdownMenuItem(text = { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Box(Modifier.size(16.dp).clip(CircleShape).background(th.accent)); Text("${th.label} (${th.labelEn})") } }, onClick = { setTheme(idx); themeExpanded = false }) }
+                        themes.forEachIndexed { idx, th -> DropdownMenuItem(text = { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Box(Modifier.size(16.dp).clip(CircleShape).background(th.accent)); Text("${th.label} (${th.labelEn})", color = theme.text) } }, onClick = { setTheme(idx); themeExpanded = false }) }
                     }
                 }
             }
@@ -482,7 +482,7 @@ class MainActivity : ComponentActivity() {
                 }
                 HorizontalDivider(color = theme.cardBorder)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(t["aboutTutorial"]!!, color = theme.subtext)
+                    Text(t["aboutTutorial"]!!, color = theme.text)
                     Text(TUTORIAL_URL, color = theme.accent, fontWeight = FontWeight.Medium, modifier = Modifier.clickable { try { (ctx as? ComponentActivity)?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TUTORIAL_URL))) } catch (_: Exception) {} })
                 }
             }
