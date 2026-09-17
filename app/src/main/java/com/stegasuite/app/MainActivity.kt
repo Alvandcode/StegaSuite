@@ -17,7 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
@@ -274,7 +273,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    AnimatedContent(targetState = currentPage, transitionSpec = { fadeIn() togetherWith fadeIn() }, label = "page") { page ->
+                    AnimatedContent(targetState = currentPage, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "page") { page ->
                         when (page) {
                             "main" -> MainPage(t, theme, lang, langIndex, { langIndex = it }, themeIndex, { themeIndex = it }, ctx)
                             "settings" -> SettingsPage(t, theme, lang, langIndex, { langIndex = it }, themeIndex, { themeIndex = it })
