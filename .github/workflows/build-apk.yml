@@ -69,8 +69,8 @@ jobs:
             echo "version=v1.1.${{ github.run_number }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon --stacktrace
+      - name: Build Release APK
+        run: gradle assembleRelease --no-daemon --stacktrace
         env:
           KEYSTORE_FILE: keystore/stegasuite.jks
           KEYSTORE_PASSWORD: stegasuite123
@@ -78,20 +78,20 @@ jobs:
           KEY_PASSWORD: stegasuite123
 
       - name: List APK
-        run: ls -lh app/build/outputs/apk/debug/
+        run: ls -lh app/build/outputs/apk/release/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: StegaSuite-${{ steps.version.outputs.tag }}
-          path: app/build/outputs/apk/debug/StegaSuite-*.apk
+          path: app/build/outputs/apk/release/StegaSuite-*.apk
           if-no-files-found: error
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/debug/StegaSuite-*.apk
+          files: app/build/outputs/apk/release/StegaSuite-*.apk
           tag_name: ${{ steps.version.outputs.tag }}
           name: StegaSuite ${{ steps.version.outputs.tag }}
           generate_release_notes: true
