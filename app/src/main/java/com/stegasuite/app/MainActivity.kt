@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 // ── Theme System ──
-private data class AppTheme(
+internal data class AppTheme(
     val bg: Color, val text: Color, val subtext: Color,
     val cardBg: Color, val cardBorder: Color,
     val accentStart: Color, val accentEnd: Color, val accent: Color,
@@ -469,6 +469,7 @@ class MainActivity : ComponentActivity() {
     // ── About Page ──
     @Composable
     fun AboutPage(t: Map<String, String>, theme: AppTheme) {
+        val ctx = LocalContext.current
         Card(Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = theme.cardBg), border = CardDefaults.outlinedCardBorder().copy(brush = Brush.linearGradient(listOf(theme.cardBorder, theme.cardBorder)))) {
             Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(t["aboutTitle"]!!, fontWeight = FontWeight.Bold, color = theme.text, fontSize = 20.sp)
@@ -482,7 +483,7 @@ class MainActivity : ComponentActivity() {
                 HorizontalDivider(color = theme.cardBorder)
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(t["aboutTutorial"]!!, color = theme.subtext)
-                    Text(TUTORIAL_URL, color = theme.accent, fontWeight = FontWeight.Medium, modifier = Modifier.clickable { try { (LocalContext.current as? ComponentActivity)?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TUTORIAL_URL))) } catch (_: Exception) {} })
+                    Text(TUTORIAL_URL, color = theme.accent, fontWeight = FontWeight.Medium, modifier = Modifier.clickable { try { (ctx as? ComponentActivity)?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(TUTORIAL_URL))) } catch (_: Exception) {} })
                 }
             }
         }
