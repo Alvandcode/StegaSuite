@@ -39,14 +39,15 @@ jobs:
         id: cache-keystore
         uses: actions/cache@v4
         with:
-          path: app/release.jks
-          key: release-keystore-v3
+          path: keystore/stegasuite.jks
+          key: release-keystore-v2
 
       - name: Generate keystore if not cached
         if: steps.cache-keystore.outputs.cache-hit != 'true'
         run: |
+          mkdir -p keystore
           keytool -genkeypair -v \
-            -keystore app/release.jks \
+            -keystore keystore/stegasuite.jks \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -alias stegasuite \
             -storepass stegasuite123 \
@@ -67,6 +68,11 @@ jobs:
 
       - name: Build Debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
+        env:
+          KEYSTORE_FILE: keystore/stegasuite.jks
+          KEYSTORE_PASSWORD: stegasuite123
+          KEY_ALIAS: stegasuite
+          KEY_PASSWORD: stegasuite123
 
       - name: Rename APK
         run: |
@@ -77,11 +83,9 @@ jobs:
       - name: Re-sign APK with apksigner (guarantee valid signature)
         run: |
           APK="release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
-          KEYSTORE="app/release.jks"
+          KEYSTORE="keystore/stegasuite.jks"
           TMP_APK="/tmp/rebuild.apk"
-          # Zipalign first
           $ANDROID_HOME/build-tools/35.0.0/zipalign -f 4 "$APK" "$TMP_APK"
-          # Re-sign with apksigner directly (bypasses Gradle signing)
           $ANDROID_HOME/build-tools/35.0.0/apksigner sign \
             --ks "$KEYSTORE" \
             --ks-key-alias stegasuite \
@@ -99,7 +103,6 @@ jobs:
           file "$APK_FILE"
           echo "=== Signature ==="
           $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose "$APK_FILE"
-          # Print signing key hash for consistency check
           echo "=== Signing Key Hash ==="
           $ANDROID_HOME/build-tools/35.0.0/apksigner verify --print-certs "$APK_FILE" | grep "SHA-256"
 

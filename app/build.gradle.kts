@@ -21,21 +21,40 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("release.jks")
-            storePassword = "stegasuite123"
-            keyAlias = "stegasuite"
-            keyPassword = "stegasuite123"
+            val ksPath = System.getenv("KEYSTORE_FILE")
+            val ksPass = System.getenv("KEYSTORE_PASSWORD")
+            val ksAlias = System.getenv("KEY_ALIAS")
+            val ksKeyPass = System.getenv("KEY_PASSWORD")
+            if (ksPath != null && ksPass != null && ksAlias != null && ksKeyPass != null) {
+                val ksFile = file(ksPath)
+                if (ksFile.exists()) {
+                    storeFile = ksFile
+                    storePassword = ksPass
+                    keyAlias = ksAlias
+                    keyPassword = ksKeyPass
+                }
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            if (signingConfigs.names.contains("release")) {
+                val ksFile = signingConfigs.getByName("release").storeFile
+                if (ksFile != null && ksFile.exists()) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
+            }
             isMinifyEnabled = false
             isShrinkResources = false
         }
         debug {
-            signingConfig = signingConfigs.getByName("release")
+            if (signingConfigs.names.contains("release")) {
+                val ksFile = signingConfigs.getByName("release").storeFile
+                if (ksFile != null && ksFile.exists()) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
+            }
             isMinifyEnabled = false
             isShrinkResources = false
         }
