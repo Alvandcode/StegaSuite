@@ -260,7 +260,7 @@ class MainActivity : ComponentActivity() {
                             IconButton(onClick = { menuExpanded = true }) {
                                 Icon(Icons.Default.MoreVert, contentDescription = null, tint = theme.text, modifier = Modifier.size(24.dp))
                             }
-                            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }, containerColor = theme.cardBg) {
                                 DropdownMenuItem(
                                     text = { Text(t["navHome"] ?: "خانه", color = theme.text) },
                                     leadingIcon = { Icon(Icons.Default.Home, contentDescription = null, tint = theme.accent) },
@@ -465,7 +465,7 @@ class MainActivity : ComponentActivity() {
                 // Language Dropdown
                 ExposedDropdownMenuBox(expanded = langExpanded, onExpandedChange = { langExpanded = it }) {
                     OutlinedTextField(value = langLabels[lang] ?: lang, onValueChange = {}, readOnly = true, label = { Text(t["language"]!!, color = theme.subtext) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(langExpanded) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = theme.text, unfocusedTextColor = theme.text, focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent))
-                    ExposedDropdownMenu(expanded = langExpanded, onDismissRequest = { langExpanded = false }) {
+                    ExposedDropdownMenu(expanded = langExpanded, onDismissRequest = { langExpanded = false }, containerColor = theme.cardBg) {
                         languages.forEachIndexed { idx, code -> DropdownMenuItem(text = { Text(langLabels[code] ?: code, color = theme.text) }, onClick = { setLang(idx); langExpanded = false }) }
                     }
                 }
@@ -473,7 +473,7 @@ class MainActivity : ComponentActivity() {
                 // Theme Dropdown
                 ExposedDropdownMenuBox(expanded = themeExpanded, onExpandedChange = { themeExpanded = it }) {
                     OutlinedTextField(value = "${theme.label} (${theme.labelEn})", onValueChange = {}, readOnly = true, label = { Text(t["theme"]!!, color = theme.subtext) }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(themeExpanded) }, modifier = Modifier.fillMaxWidth().menuAnchor(), shape = RoundedCornerShape(14.dp), colors = OutlinedTextFieldDefaults.colors(focusedTextColor = theme.text, unfocusedTextColor = theme.text, focusedBorderColor = theme.accent, unfocusedBorderColor = theme.cardBorder, focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent))
-                    ExposedDropdownMenu(expanded = themeExpanded, onDismissRequest = { themeExpanded = false }) {
+                    ExposedDropdownMenu(expanded = themeExpanded, onDismissRequest = { themeExpanded = false }, containerColor = theme.cardBg) {
                         themes.forEachIndexed { idx, th -> DropdownMenuItem(text = { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) { Box(Modifier.size(16.dp).clip(CircleShape).background(th.accent)); Text("${th.label} (${th.labelEn})", color = theme.text) } }, onClick = { setTheme(idx); themeExpanded = false }) }
                     }
                 }
