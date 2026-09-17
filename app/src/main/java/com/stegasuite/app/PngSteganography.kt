@@ -90,12 +90,18 @@ object PngSteganography {
         }
 
         val packet = MAGIC_V2 + ByteBuffer.allocate(8).putLong(payload.size.toLong()).array() + payload
-        val capacityBits = bitmap.width.toLong() * bitmap.height * 3L
+
+        val opaqueBmp = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(opaqueBmp)
+        canvas.drawColor(android.graphics.Color.WHITE)
+        canvas.drawBitmap(bitmap, 0f, 0f, null)
+
+        val capacityBits = opaqueBmp.width.toLong() * opaqueBmp.height * 3L
         require(packet.size.toLong() * 8L <= capacityBits) {
-            "File too large! Capacity: ${capacityBytes(bitmap)/1024}KB, Needed: ${packet.size/1024}KB"
+            "File too large! Capacity: ${capacityBytes(opaqueBmp)/1024}KB, Needed: ${packet.size/1024}KB"
         }
 
-        val out = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val out = opaqueBmp.copy(Bitmap.Config.ARGB_8888, true)
         val w = out.width; val h = out.height
         val pixels = IntArray(w * h)
         out.getPixels(pixels, 0, w, 0, 0, w, h)
@@ -134,6 +140,7 @@ object PngSteganography {
             pixels[i] = a or (channels[0] shl 16) or (channels[1] shl 8) or channels[2]
         }
         out.setPixels(pixels, 0, w, 0, 0, w, h)
+        opaqueBmp.recycle()
         return out
     }
 
@@ -206,9 +213,18 @@ object PngSteganography {
         var idx = 0
         for (pix in pixels) {
             if (idx >= count) break
-            val r = (pix shr 16) and 255
-            val g = (pix shr 8) and 255
-            val b = pix and 255
+            val a = pix and -0x1000000
+            val alphaVal = (a shr 24) and 0xFF
+            var r = (pix shr 16) and 255
+            var g = (pix shr 8) and 255
+            var b = pix and 255
+
+            if (alphaVal != 0 && alphaVal != 255) {
+                r = (r * 255 + alphaVal / 2) / alphaVal
+                g = (g * 255 + alphaVal / 2) / alphaVal
+                b = (b * 255 + alphaVal / 2) / alphaVal
+            }
+
             val chs = intArrayOf(r, g, b)
             for (c in chs) {
                 if (idx >= count) break
