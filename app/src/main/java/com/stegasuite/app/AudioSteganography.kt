@@ -15,11 +15,24 @@ object AudioSteganography {
     private const val HEADER_SIZE = 12
 
     fun isWav(data: ByteArray): Boolean {
-        if (data.size < 44) return false
+        if (data.size < 12) return false
         return data[0] == 'R'.code.toByte() && data[1] == 'I'.code.toByte() &&
                data[2] == 'F'.code.toByte() && data[3] == 'F'.code.toByte() &&
                data[8] == 'W'.code.toByte() && data[9] == 'A'.code.toByte() &&
                data[10] == 'V'.code.toByte() && data[11] == 'E'.code.toByte()
+    }
+
+    fun findDataChunkOffset(data: ByteArray): Int {
+        if (data.size < 12) return 44
+        var offset = 12
+        while (offset + 8 <= data.size) {
+            val chunkId = String(data, offset, 4, Charsets.US_ASCII)
+            val chunkSize = ByteBuffer.wrap(data, offset + 4, 4).order(ByteOrder.LITTLE_ENDIAN).int
+            if (chunkSize < 0 || offset + 8 + chunkSize > data.size) return 44
+            if (chunkId == "data") return offset + 8
+            offset += 8 + chunkSize + (chunkSize and 1)
+        }
+        return 44
     }
 
     fun getAudioInfo(data: ByteArray): String {
@@ -28,9 +41,10 @@ object AudioSteganography {
         val channels = buf.getShort(22).toInt() and 0xFFFF
         val sampleRate = buf.getInt(24)
         val bitsPerSample = buf.getShort(34).toInt() and 0xFFFF
-        val dataSize = buf.getInt(40)
+        val dataOffset = findDataChunkOffset(data)
+        val sampleDataSize = data.size - dataOffset
         val durationSec = if (channels > 0 && sampleRate > 0 && bitsPerSample > 0) {
-            dataSize.toLong() * 8 / (channels * sampleRate * bitsPerSample)
+            sampleDataSize.toLong() * 8 / (channels * sampleRate * bitsPerSample)
         } else 0L
         return "${sampleRate}Hz, ${bitsPerSample}bit, ${channels}ch, ${durationSec}s"
     }
@@ -41,7 +55,8 @@ object AudioSteganography {
         val channels = buf.getShort(22).toInt() and 0xFFFF
         val bitsPerSample = buf.getShort(34).toInt() and 0xFFFF
         if (channels <= 0 || bitsPerSample <= 0) return 0L
-        val sampleDataSize = data.size - 44
+        val dataOffset = findDataChunkOffset(data)
+        val sampleDataSize = data.size - dataOffset
         val totalSamples = sampleDataSize / (channels * (bitsPerSample / 8))
         return totalSamples * channels / 8L
     }
@@ -50,7 +65,6 @@ object AudioSteganography {
 
     fun hide(wavData: ByteArray, payload: ByteArray, fileName: String, password: String?): ByteArray {
         require(isWav(wavData)) { "Not a valid WAV file" }
-        require(wavData.size > 44) { "WAV file too small" }
 
         val safeName = if (fileName.isBlank()) "file" else fileName
         val nameBytes = safeName.toByteArray(Charsets.UTF_8)
@@ -75,7 +89,8 @@ object AudioSteganography {
         require(channels > 0 && bitsPerSample > 0) { "Invalid WAV parameters" }
 
         val bytesPerSample = bitsPerSample / 8
-        val totalSampleBytes = (wavData.size - 44)
+        val dataOffset = findDataChunkOffset(wavData)
+        val totalSampleBytes = wavData.size - dataOffset
         val totalSamples = totalSampleBytes / (channels * bytesPerSample)
         val capacityBits = totalSamples * channels.toLong()
         require(packet.size.toLong() * 8L <= capacityBits) {
@@ -86,7 +101,7 @@ object AudioSteganography {
         var bitIndex = 0
         val totalBits = packet.size * 8
 
-        for (i in 44 until out.size step bytesPerSample) {
+        for (i in dataOffset until out.size step bytesPerSample) {
             if (bitIndex >= totalBits) break
             for (ch in 0 until channels) {
                 if (bitIndex >= totalBits) break
@@ -118,9 +133,10 @@ object AudioSteganography {
         val channels = buf.getShort(22).toInt() and 0xFFFF
         val bitsPerSample = buf.getShort(34).toInt() and 0xFFFF
         val bytesPerSample = bitsPerSample / 8
+        val dataOffset = findDataChunkOffset(wavData)
 
         val sampleBits = mutableListOf<Int>()
-        for (i in 44 until wavData.size step bytesPerSample) {
+        for (i in dataOffset until wavData.size step bytesPerSample) {
             for (ch in 0 until channels) {
                 val sampleOffset = i + ch * bytesPerSample
                 if (sampleOffset + bytesPerSample > wavData.size) break

@@ -205,6 +205,20 @@ object PngSteganography {
         }
     }
 
+    fun extractFromBytes(carrierData: ByteArray, password: String?, carrierType: CarrierType): ExtractResult {
+        if (carrierType == CarrierType.PNG || carrierType == CarrierType.BMP) {
+            val bmp = BitmapFactory.decodeByteArray(carrierData, 0, carrierData.size)
+            if (bmp != null) {
+                try {
+                    return extract(bmp, password)
+                } finally {
+                    bmp.recycle()
+                }
+            }
+        }
+        return extractGeneric(carrierData, password, carrierType)
+    }
+
     private fun readBits(bitmap: Bitmap, count: Int): IntArray {
         val w = bitmap.width; val h = bitmap.height
         val pixels = IntArray(w * h)

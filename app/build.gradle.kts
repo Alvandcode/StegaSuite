@@ -22,29 +22,39 @@ android {
 
     signingConfigs {
         create("release") {
-            val ksFile = System.getenv("KEYSTORE_FILE")
-            if (ksFile != null && file(ksFile).exists()) {
-                storeFile = file(ksFile)
-                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
-                keyAlias = System.getenv("KEY_ALIAS") ?: ""
-                keyPassword = System.getenv("KEY_PASSWORD") ?: ""
+            val ksPath = System.getenv("KEYSTORE_FILE")
+            val ksPass = System.getenv("KEYSTORE_PASSWORD")
+            val ksAlias = System.getenv("KEY_ALIAS")
+            val ksKeyPass = System.getenv("KEY_PASSWORD")
+            if (ksPath != null && ksPass != null && ksAlias != null && ksKeyPass != null) {
+                val ksFile = file(ksPath)
+                if (ksFile.exists()) {
+                    storeFile = ksFile
+                    storePassword = ksPass
+                    keyAlias = ksAlias
+                    keyPassword = ksKeyPass
+                }
             }
         }
     }
 
     buildTypes {
         release {
-            val ksFile = System.getenv("KEYSTORE_FILE")
-            if (ksFile != null && file(ksFile).exists()) {
-                signingConfig = signingConfigs.getByName("release")
+            if (signingConfigs.names.contains("release")) {
+                val ksFile = signingConfigs.getByName("release").storeFile
+                if (ksFile != null && ksFile.exists()) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
             }
             isMinifyEnabled = false
             isShrinkResources = false
         }
         debug {
-            val ksFile = System.getenv("KEYSTORE_FILE")
-            if (ksFile != null && file(ksFile).exists()) {
-                signingConfig = signingConfigs.getByName("release")
+            if (signingConfigs.names.contains("release")) {
+                val ksFile = signingConfigs.getByName("release").storeFile
+                if (ksFile != null && ksFile.exists()) {
+                    signingConfig = signingConfigs.getByName("release")
+                }
             }
             isMinifyEnabled = false
             isShrinkResources = false
@@ -58,14 +68,7 @@ android {
 
     buildFeatures { compose = true }
 
-    // اسم فایل خروجی: StegaSuite-v1.1.15.apk به جای app-debug.apk
-    applicationVariants.all {
-        outputs.all {
-            val variant = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            val ver = defaultConfig.versionName
-            variant.outputFileName = "StegaSuite-v${ver}.apk"
-        }
-    }
+    // APK naming handled in CI workflow
 }
 
 kotlin { jvmToolchain(17) }

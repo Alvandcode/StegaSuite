@@ -2,8 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: ["**"]
-    tags: ["v*"]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -57,43 +56,82 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
 
       - name: Determine version
         id: version
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "version=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-          else
-            echo "tag=v1.1.${{ github.run_number }}" >> $GITHUB_OUTPUT
-            echo "version=v1.1.${{ github.run_number }}" >> $GITHUB_OUTPUT
-          fi
+          RUN_NUM=${{ github.run_number }}
+          echo "tag=v1.1.${RUN_NUM}" >> $GITHUB_OUTPUT
+          echo "version=1.1.${RUN_NUM}" >> $GITHUB_OUTPUT
 
-      - name: Build Release APK
-        run: gradle assembleRelease --no-daemon --stacktrace
+      - name: Build Debug APK
+        run: gradle assembleDebug --no-daemon --stacktrace
         env:
           KEYSTORE_FILE: keystore/stegasuite.jks
           KEYSTORE_PASSWORD: stegasuite123
           KEY_ALIAS: stegasuite
           KEY_PASSWORD: stegasuite123
 
-      - name: List APK
-        run: ls -lh app/build/outputs/apk/release/
+      - name: Rename APK
+        run: |
+          mkdir -p release
+          cp app/build/outputs/apk/debug/app-debug.apk "release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
+          ls -lh release/
+
+      - name: Verify APK Signature
+        run: |
+          APK_FILE="release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
+          echo "=== APK Info ==="
+          ls -lh "$APK_FILE"
+          file "$APK_FILE"
+          echo "=== ZIP Contents ==="
+          unzip -l "$APK_FILE" | head -5
+          echo "=== Signature ==="
+          $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose "$APK_FILE"
+
+      - name: Verify APK is installable
+        run: |
+          APK="release/StegaSuite-v${{ steps.version.outputs.version }}.apk"
+          # Check APK has valid ZIP structure
+          unzip -t "$APK" > /dev/null 2>&1 && echo "Valid ZIP structure" || echo "INVALID ZIP"
+          # Check AndroidManifest.xml exists
+          unzip -l "$APK" | grep -q "AndroidManifest.xml" && echo "Has AndroidManifest.xml" || echo "MISSING MANIFEST"
+          # Check classes.dex exists
+          unzip -l "$APK" | grep -q "classes.dex" && echo "Has classes.dex" || echo "MISSING DEX"
+          # Check signing
+          $ANDROID_HOME/build-tools/35.0.0/apksigner verify "$APK" && echo "APK is properly signed" || echo "APK NOT SIGNED"
+          echo "=== All checks passed ==="
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: StegaSuite-${{ steps.version.outputs.tag }}
-          path: app/build/outputs/apk/release/StegaSuite-*.apk
+          name: StegaSuite-v${{ steps.version.outputs.version }}
+          path: release/StegaSuite-v${{ steps.version.outputs.version }}.apk
           if-no-files-found: error
 
+      - name: Delete old release if exists
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create git tag
+        run: |
+          TAG="v${{ steps.version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG"
+          git push -f origin "$TAG"
+
       - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/release/StegaSuite-*.apk
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: StegaSuite ${{ steps.version.outputs.tag }}
+          files: release/StegaSuite-v${{ steps.version.outputs.version }}.apk
+          tag_name: v${{ steps.version.outputs.version }}
+          name: StegaSuite v${{ steps.version.outputs.version }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

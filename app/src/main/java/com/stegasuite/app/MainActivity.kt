@@ -566,18 +566,8 @@ class MainActivity : ComponentActivity() {
                                             ctx.contentResolver.openInputStream(carrierUri!!)?.use { it.readBytes() } ?: error("file read error")
                                         }
                                         val ex = withContext(Dispatchers.IO) {
-                                            val magicPng = carrierBytes.size >= 4 && carrierBytes[0] == 0x89.toByte() && carrierBytes[1] == 0x50.toByte()
-                                            val magicBmp = carrierBytes.size >= 2 && carrierBytes[0] == 0x42.toByte() && carrierBytes[1] == 0x4D.toByte()
-                                            if (magicPng || magicBmp) {
-                                                val bmp = BitmapFactory.decodeByteArray(carrierBytes, 0, carrierBytes.size)
-                                                if (bmp != null) {
-                                                    PngSteganography.extract(bmp, pass.ifEmpty { null }).also { bmp.recycle() }
-                                                } else {
-                                                    PngSteganography.extractGeneric(carrierBytes, pass.ifEmpty { null }, PngSteganography.detectCarrierType(getName(carrierUri!!), carrierBytes))
-                                                }
-                                            } else {
-                                                PngSteganography.extractGeneric(carrierBytes, pass.ifEmpty { null }, PngSteganography.detectCarrierType(getName(carrierUri!!), carrierBytes))
-                                            }
+                                            val ct = PngSteganography.detectCarrierType(getName(carrierUri!!), carrierBytes)
+                                            PngSteganography.extractFromBytes(carrierBytes, pass.ifEmpty { null }, ct)
                                         }
                                         pendingExtractResult = Pair(ex.bytes, ex.fileName)
                                         saveFile.launch(ex.fileName)
