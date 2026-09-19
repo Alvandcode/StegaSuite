@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StegaSuite Step-by-Step Tutorial | Secure File Hiding</title>
+<meta name="description" content="Complete visual tutorial for StegaSuite — hide any file inside images, audio and other files with AES-256 encryption (Android + Windows)">
+<style>
+  :root{
+    --bg:#0a0a1a; --bg2:#0f0f2a; --card:#161635; --card2:#1c1c45;
+    --line:rgba(255,255,255,.08); --txt:#eef2ff; --muted:#a9b4d0;
+    --purple:#a855f7; --purple-d:#7c3aed; --purple-l:#c084fc;
+    --pink:#ec4899; --blue:#60a5fa; --green:#34d399; --amber:#fbbf24;
+    --rose:#fb7185; --teal:#2dd4bf; --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; color:var(--txt);
+    font-family:"Segoe UI",Tahoma,Verdana,sans-serif;
+    background:
+      radial-gradient(1100px 500px at 85% -5%, rgba(168,85,247,.14), transparent 60%),
+      radial-gradient(900px 480px at 10% 0%, rgba(236,72,153,.12), transparent 60%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+    line-height:1.9; font-size:16px;
+  }
+  a{color:var(--purple-l)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px 90px}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;overflow:hidden;border-radius:0 0 34px 34px;
+    background:linear-gradient(135deg,#7c3aed 0%,#a855f7 35%,#ec4899 65%,#6366f1 100%);
+    padding:64px 20px 70px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.5)}
+  .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;filter:blur(2px);opacity:.25}
+  .hero::before{width:380px;height:380px;background:#fff;top:-180px;left:-100px}
+  .hero::after{width:280px;height:280px;background:#fde68a;bottom:-150px;right:-80px}
+  .hero h1{margin:0 0 10px;font-size:clamp(28px,5vw,48px);font-weight:900;text-shadow:0 3px 18px rgba(0,0,0,.35)}
+  .hero .subtitle{margin:8px auto 0;max-width:720px;color:#f1f5ff;font-size:clamp(15px,2.6vw,19px)}
+  .hero .badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+  .badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
+    padding:6px 16px;border-radius:999px;font-size:14px;font-weight:700;backdrop-filter:blur(6px)}
+  .hero .cta{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .hero .cta a{text-decoration:none;font-weight:900;padding:12px 30px;border-radius:999px;transition:.2s}
+  .btn-primary{background:#fff;color:#111c33}
+  .btn-outline{background:rgba(0,0,0,.3);color:#fff;border:1px solid rgba(255,255,255,.5)}
+  .hero .cta a:hover{transform:translateY(-3px)}
+
+  /* ---------- Sticky nav ---------- */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(10,10,26,.85);border-bottom:1px solid var(--line)}
+  nav .inner{max-width:1060px;margin:0 auto;padding:10px 16px;display:flex;gap:8px;
+    overflow-x:auto;scrollbar-width:none}
+  nav .inner::-webkit-scrollbar{display:none}
+  nav a{flex:0 0 auto;text-decoration:none;color:var(--txt);font-weight:700;font-size:14px;
+    padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+    transition:.2s}
+  nav a:hover,nav a.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+  /* ---------- Sections & cards ---------- */
+  section{margin-top:46px}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .sec-head .ico{width:52px;height:52px;flex:0 0 52px;border-radius:16px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--purple-d),var(--pink));box-shadow:0 10px 26px rgba(168,85,247,.25)}
+  .sec-head .ico svg{width:28px;height:28px;stroke:#fff}
+  .sec-head h2{margin:0;font-size:clamp(20px,3.6vw,28px);font-weight:900}
+  .sec-head small{display:block;color:var(--muted);font-weight:400;font-size:14px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));
+    border:1px solid var(--line);border-radius:var(--radius);padding:24px;margin:16px 0;
+    box-shadow:0 14px 40px rgba(0,0,0,.35)}
+  .card h3{margin:0 0 8px;font-size:19px;color:var(--amber)}
+  .card h3 .tag{font-size:12px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.4);
+    color:var(--amber);border-radius:999px;padding:2px 12px;margin-left:8px;vertical-align:middle}
+  .card h3 .tag.ok{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.45);color:var(--green)}
+  .card h3 .tag.warn{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.45);color:var(--rose)}
+  .card h3 .tag.info{background:rgba(96,165,250,.12);border-color:rgba(96,165,250,.45);color:var(--blue)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+  .mini{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .mini b{color:var(--purple-l)}
+  ol.steps,ul.tips{margin:10px 0;padding-left:22px}
+  ol.steps li,ul.tips li{margin:8px 0}
+  ol.steps li::marker{color:var(--purple);font-weight:900}
+
+  /* ---------- Code ---------- */
+  .code{position:relative;background:#070d1a;border:1px solid var(--line);border-radius:14px;
+    margin:12px 0;overflow:hidden}
+  .code header{display:flex;justify-content:space-between;align-items:center;
+    padding:6px 14px;font-size:12.5px;color:var(--muted);border-bottom:1px solid var(--line);
+    background:rgba(255,255,255,.03)}
+  .code pre{direction:ltr;text-align:left;margin:0;padding:14px 16px;overflow-x:auto;
+    font-family:Consolas,"Cascadia Code",monospace;font-size:13.5px;line-height:1.9;color:#d7f0ff}
+  .code .out{border-top:1px dashed var(--line);color:#c084fc}
+  .copy{cursor:pointer;border:1px solid var(--purple);background:transparent;color:var(--purple);
+    border-radius:9px;padding:3px 14px;font-family:inherit;font-size:12.5px;font-weight:700;transition:.2s}
+  .copy:hover{background:var(--purple);color:#fff}
+
+  /* ---------- Callouts & table ---------- */
+  .note{border-radius:14px;padding:14px 18px;margin:12px 0;font-size:15px;border:1px solid}
+  .note.info{background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.4)}
+  .note.ok{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.4)}
+  .note.warn{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.45)}
+  .note.bad{background:rgba(251,113,133,.1);border-color:rgba(251,113,133,.45)}
+  .note b{display:block;margin-bottom:2px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:rgba(168,85,247,.12);color:var(--purple-l)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.025)}
+  .tbl-wrap{overflow-x:auto;border-radius:14px}
+
+  /* ---------- Feature cards ---------- */
+  .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:16px 0}
+  .feat{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:20px;
+    transition:.2s}
+  .feat:hover{border-color:var(--purple);transform:translateY(-2px)}
+  .feat .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;margin-bottom:12px;
+    font-size:22px}
+  .feat h4{margin:0 0 6px;font-size:16px;color:var(--purple-l)}
+  .feat p{margin:0;color:var(--muted);font-size:14px;line-height:1.8}
+
+  /* ---------- Flow diagram ---------- */
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0;padding:18px;
+    background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:14px}
+  .flow-step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;
+    font-weight:700;font-size:14px;white-space:nowrap}
+  .flow-arrow{color:var(--purple);font-size:20px;font-weight:900}
+
+  /* ---------- Screenshot placeholder ---------- */
+  .screenshot{background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(236,72,153,.08));
+    border:2px dashed rgba(168,85,247,.3);border-radius:16px;padding:40px 20px;text-align:center;
+    margin:16px 0;color:var(--muted);font-size:15px}
+  .screenshot .ph{font-size:48px;margin-bottom:10px}
+
+  footer{margin-top:60px;text-align:center;color:var(--muted);font-size:14px}
+  footer .links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0}
+  footer .links a{text-decoration:none;font-weight:700;border:1px solid var(--purple);
+    border-radius:999px;padding:8px 26px}
+  footer .top{display:inline-block;margin-top:12px;text-decoration:none;font-weight:700;
+    border:1px solid var(--purple);border-radius:999px;padding:8px 26px}
+
+  @media (max-width:640px){
+    body{font-size:15px}
+    .card{padding:18px}
+    .sec-head .ico{width:44px;height:44px;flex-basis:44px}
+    .flow{flex-direction:column;align-items:stretch}
+    .flow-arrow{transform:rotate(90deg);text-align:center}
+  }
+</style>
+</head>
+<body id="top">
+
+<header class="hero">
+  <h1>🛡️ StegaSuite</h1>
+  <p class="subtitle">Secure file hiding with AES-256 encryption — hide any file inside any file</p>
+  <div class="badges">
+    <span class="badge">AES-256-GCM</span>
+    <span class="badge">Android + Windows</span>
+    <span class="badge">Colorful themes</span>
+    <span class="badge">Multi-language support</span>
+    <span class="badge">30+ formats</span>
+    <span class="badge">No root needed</span>
+    <span class="badge">Open source</span>
+  </div>
+  <div class="cta">
+    <a class="btn-primary" href="https://github.com/Alvandcode/StegaSuite/releases" target="_blank" rel="noopener">⬇️ Download Android (APK)</a>
+    <a class="btn-primary" href="https://github.com/Alvandcode/StegaSuite-Windows/releases" target="_blank" rel="noopener" style="background:#0ea5e9;color:#fff">⬇️ Download Windows (EXE)</a>
+    <a class="btn-outline" href="tutorial.html">🌐 فارسی</a>
+    <a class="btn-outline" href="https://github.com/Alvandcode/StegaSuite" target="_blank" rel="noopener">⭐ Star the project</a>
+  </div>
+</header>
+
+<nav><div class="inner" id="navlinks">
+  <a href="#intro">Intro</a>
+  <a href="#features">Features</a>
+  <a href="#hide">Hiding</a>
+  <a href="#extract">Extract</a>
+  <a href="#windows">Windows</a>
+  <a href="#formats">Formats</a>
+  <a href="#crypto">Crypto</a>
+  <a href="#capacity">Capacity</a>
+  <a href="#limits">Limits</a>
+  <a href="#faq">Troubleshooting</a>
+</div></nav>
+
+<div class="wrap">
+
+<!-- ================= INTRO ================= -->
+<section id="intro">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+    <h2>What is StegaSuite?<small>An open-source tool for secure file hiding on Android &amp; Windows</small></h2>
+  </div>
+
+  <div class="card">
+    <p>
+      <b>StegaSuite</b> is an open-source app that hides any file inside other files using
+      <b>Steganography</b>. Unlike regular encryption, which only encrypts the content,
+      StegaSuite also hides the very existence of the hidden file — anyone viewing the carrier
+      file has no idea anything is hidden inside!
+    </p>
+
+    <div class="flow">
+      <div class="flow-step">📷 Carrier (image/audio/...)</div>
+      <span class="flow-arrow">+</span>
+      <div class="flow-step">📄 Payload file</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step">🔑 Password (optional)</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" style="background:linear-gradient(135deg,var(--purple-d),var(--pink));color:#fff;border-color:var(--purple)">🔒 Normal-looking output</div>
+    </div>
+
+    <div class="note info">
+      <b>💡 Why steganography?</b>
+      Regular encryption (like a passworded ZIP) advertises that something is encrypted. Steganography hides the encrypted file inside a completely ordinary file (e.g. a photo). Nobody without the right tool can even tell something is hidden!
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="features">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
+    <h2>Key features<small>What makes StegaSuite different</small></h2>
+  </div>
+
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="ico" style="background:rgba(168,85,247,.15)">🔐</div>
+      <h4>AES-256-GCM encryption</h4>
+      <p>The hidden file is encrypted with military-grade AES-256. Even if someone finds the hiding mechanism, they cannot read the content without the password.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(236,72,153,.15)">🎨</div>
+      <h4>30+ formats supported</h4>
+      <p>PNG, BMP, TIFF, WebP, WAV, MP3, MP4, PDF, ZIP and dozens more as carriers. The payload has no format limits at all.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(96,165,250,.15)">🌍</div>
+      <h4>Multi-language UI</h4>
+      <p>Full Persian (RTL) and English (LTR) support with instant switching, plus Arabic, Russian and Chinese on Windows. Modern design with dark and light colorful themes.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(52,211,153,.15)">🧠</div>
+      <h4>Smart format detection</h4>
+      <p>No manual format selection needed. The app detects the carrier format automatically by reading Magic Bytes.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(251,191,36,.15)">📊</div>
+      <h4>Capacity calculation</h4>
+      <p>Before hiding, the real capacity of the carrier is shown so you know the maximum size you can hide.</p>
+    </div>
+    <div class="feat">
+      <div class="ico" style="background:rgba(251,113,133,.15)">⚡</div>
+      <h4>No root needed</h4>
+      <p>No root or jailbreak required. Install directly from Google Play or GitHub Releases and use it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HIDE ================= -->
+<section id="hide">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+    <h2>How to hide a file<small>Step by step, from picking files to saving the output</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Step 1: Carrier file <span class="tag info">Carrier</span></h3>
+    <p>The carrier is the file your secret will be hidden inside. After hiding, it still looks completely normal.</p>
+    <ol class="steps">
+      <li>Open the app. By default it is on <b>"Hide"</b> mode.</li>
+      <li>In the first card, click <b>"Pick carrier file"</b>.</li>
+      <li>Choose a file from the system picker (image, audio, video, PDF, ...).</li>
+      <li>File info is shown: format type, name, size, and <b>hiding capacity</b>.</li>
+    </ol>
+
+    <div class="note warn">
+      <b>⚠️ Lossy formats warning</b>
+      If the carrier is JPEG, WebP or another lossy format, an orange warning is shown.
+      These formats may corrupt the hidden data. For best results use <b>PNG</b> or <b>BMP</b>.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Step 2: Payload file <span class="tag info">Payload</span></h3>
+    <p>You can hide anything: text, images, audio, video, PDF, ZIP, anything.</p>
+    <ol class="steps">
+      <li>In the second card, click <b>"Pick payload file"</b>.</li>
+      <li>Select the file you want to hide.</li>
+      <li>Its name and size are displayed.</li>
+    </ol>
+    <div class="note ok"><b>✅ No format limits</b>There is no restriction on the payload type. Any file with any extension can be hidden.</div>
+  </div>
+
+  <div class="card">
+    <h3>Step 3: Password <span class="tag">optional</span></h3>
+    <p>A password encrypts the hidden file with <b>AES-256</b> on top of hiding it. This extra layer is called <b>defense in depth</b>.</p>
+    <ol class="steps">
+      <li>Type a password in the third card.</li>
+      <li>Click the eye icon 👁️ to show/hide it.</li>
+      <li>Leave it empty and the file is stored with CRC32 only (no encryption).</li>
+    </ol>
+    <div class="note bad"><b>⚠️ Don't forget your password!</b>
+    If you forget it, the hidden file cannot be recovered. Write it down somewhere safe.</div>
+  </div>
+
+  <div class="card">
+    <h3>Step 4: Save the output <span class="tag ok">save</span></h3>
+    <ol class="steps">
+      <li>Click <b>"Hide &amp; Save"</b>.</li>
+      <li>Wait for the operation to finish (usually a few seconds).</li>
+      <li>The output is saved with <b>(st)</b> added to the name, e.g. <span dir="ltr">photo(st).png</span>.</li>
+      <li>Click the saved-file link to open it.</li>
+    </ol>
+  </div>
+
+  <div class="screenshot">
+    <div class="ph">📱</div>
+    <b>Hide screen</b><br>
+    App overview in Hide mode with a carrier selected
+  </div>
+</section>
+
+<!-- ================= EXTRACT ================= -->
+<section id="extract">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 019.9-1"/></svg></span>
+    <h2>How to extract a hidden file<small>Recovering the file from inside the carrier</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Extraction steps <span class="tag ok">easy</span></h3>
+    <ol class="steps">
+      <li>Tap the <b>open lock</b> 🔓 icon at the top to switch to <b>"Extract"</b> mode.</li>
+      <li>Select the carrier that contains the hidden file.</li>
+      <li>If it was hidden with a password, enter it.</li>
+      <li>Tap <b>"Extract hidden file"</b>.</li>
+      <li>The extracted file is saved and shown.</li>
+    </ol>
+
+    <div class="note info">
+      <b>💡 Automatic detection</b>
+      The app detects the hidden file via Magic Bytes, not the file extension. Even if you rename the carrier or change its extension, extraction still works!
+    </div>
+  </div>
+
+  <div class="screenshot">
+    <div class="ph">🔓</div>
+    <b>Extract screen</b><br>
+    App in Extract mode with a carrier selected
+  </div>
+</section>
+
+<!-- ================= WINDOWS ================= -->
+<section id="windows">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+    <h2>Windows edition<small>Same engine, WPF desktop UI — compatible with Android</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Download for Windows <span class="tag ok">Windows 10/11 x64</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Edition</th><th>File</th><th>Notes</th></tr>
+      <tr><td><b>Installer (self-contained)</b></td><td dir="ltr">StegaSuite-Install-2.0.0.zip</td><td>Unzip and run <span dir="ltr">Install.bat</span> (with admin → Program Files, without → per-user install). No .NET needed</td></tr>
+      <tr><td><b>Portable</b></td><td dir="ltr">StegaSuite-Portable-2.0.0.exe</td><td>No install — just install <a href="https://dotnet.microsoft.com/download" target="_blank" rel="noopener">.NET 10 Desktop Runtime</a> once</td></tr>
+    </table></div>
+    <div class="note ok"><b>✅ Fully compatible</b>The file format is identical (<span dir="ltr">SGP2 / SGF1 / SGA1</span>); files hidden on Windows open on Android and vice versa (for PNG/BMP/WAV).</div>
+    <p style="margin:10px 0">
+      <a href="https://github.com/Alvandcode/StegaSuite-Windows/releases" target="_blank" rel="noopener"><b>⬇️ Download from Windows Releases</b></a>
+      &nbsp;•&nbsp;
+      <a href="https://github.com/Alvandcode/StegaSuite-Windows" target="_blank" rel="noopener">StegaSuite-Windows repo</a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>Step 0: Login / account <span class="tag info">Windows only</span></h3>
+    <p>The app does not open without login (fullscreen login screen):</p>
+    <ol class="steps">
+      <li><b>Sign up:</b> username + password + confirm → "Create account".</li>
+      <li>Save the <b>one-time recovery code</b> immediately! With it + the backup file (<span dir="ltr">*.stegabak</span>) you can recover a forgotten password.</li>
+      <li><b>Log in:</b> username + password, or the <b>Google</b> button (system browser + PKCE).</li>
+      <li><b>Backup:</b> ⚙️ Settings → export backup (AES-256-GCM encrypted). Language/theme are stored per user.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Hiding on Windows <span class="tag ok">🏠 Home tab</span></h3>
+    <ol class="steps">
+      <li>In the capsule sidebar click <b>🏠 Home</b> (default).</li>
+      <li>In the "Carrier file" card click <b>Browse...</b> — or <b>drag &amp; drop</b> a file into the field.</li>
+      <li>Format, name, size and <b>capacity</b> are displayed.</li>
+      <li>Pick the payload in the second card (any format, no limits).</li>
+      <li>Set a password (recommended — 👁️ toggles visibility) or leave empty (CRC32 only).</li>
+      <li>Click <b>"Hide &amp; Save"</b>; the suggested name carries <span dir="ltr">(st)</span>, e.g. <span dir="ltr">photo(st).png</span>. The op is logged in <b>History</b>.</li>
+    </ol>
+    <div class="note warn"><b>⚠️ Lossy formats</b>On Windows too, prefer <b>PNG / BMP / WAV</b>; JPEG and WebP may destroy the data.</div>
+  </div>
+
+  <div class="card">
+    <h3>Extracting on Windows <span class="tag ok">🔓 Extract tab</span></h3>
+    <ol class="steps">
+      <li>In the sidebar click <b>🔓 Extract</b>.</li>
+      <li>Pick the carrier (drag &amp; drop works).</li>
+      <li>Enter the password if one was set.</li>
+      <li>Click <b>"Extract Hidden File"</b> — the file is saved with its <b>original name and extension</b>.</li>
+    </ol>
+    <div class="note info"><b>💡 Other tabs:</b>ℹ️ About • ✉️ Contact • ❤️ Support • ⚙️ Settings (5 languages: Persian, Arabic, English, Russian, Chinese + 9 dark/light themes).</div>
+  </div>
+</section>
+
+<!-- ================= FORMATS ================= -->
+<section id="formats">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg></span>
+    <h2>Supported formats<small>Every format usable as carrier or payload</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Carrier formats <span class="tag ok">high quality</span></h3>
+    <p>Natively supported with the best quality:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>Format</th><th>Extension</th><th>Method</th><th>Notes</th></tr>
+      <tr><td><b>PNG</b></td><td dir="ltr">.png</td><td>pixel LSB</td><td>best choice — no quality loss</td></tr>
+      <tr><td><b>BMP</b></td><td dir="ltr">.bmp</td><td>pixel LSB</td><td>excellent quality, large size</td></tr>
+      <tr><td><b>WAV</b></td><td dir="ltr">.wav</td><td>audio-sample LSB</td><td>no audible change</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>Carrier formats <span class="tag warn">use with care</span></h3>
+    <p>Supported via generic LSB. Some may degrade quality:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>Group</th><th>Formats</th><th>Notes</th></tr>
+      <tr><td><b>Images</b></td><td dir="ltr">TIFF, WebP, GIF, SVG</td><td>header is skipped via structure detection</td></tr>
+      <tr><td><b>Audio</b></td><td dir="ltr">MP3, FLAC, OGG, M4A, AAC</td><td>LSB changes after the audio header</td></tr>
+      <tr><td><b>Video</b></td><td dir="ltr">MP4, AVI, MKV, MOV, WebM</td><td>MP4/Matroska atom detection</td></tr>
+      <tr><td><b>Docs</b></td><td dir="ltr">PDF, DOCX, XLSX, PPTX, TXT</td><td>skips to %%EOF / file header</td></tr>
+      <tr><td><b>Archives</b></td><td dir="ltr">ZIP, RAR, 7Z, TAR, GZ</td><td>skips the 30-byte ZIP header</td></tr>
+      <tr><td><b>Code</b></td><td dir="ltr">JS, PY, TS, HTML, CSS</td><td>4-byte safe offset</td></tr>
+    </table></div>
+    <div class="note warn"><b>⚠️ Lossy formats</b>JPEG and WebP use lossy compression. If the carrier is JPEG, hidden data may be corrupted. For safe results use <b>PNG</b> or <b>BMP</b>.</div>
+  </div>
+
+  <div class="card">
+    <h3>Payload formats <span class="tag ok">unlimited</span></h3>
+    <p><b>📄 Docs:</b> <span dir="ltr">PDF, DOCX, XLSX, PPTX, TXT, CSV, JSON, XML, Markdown</span></p>
+    <p><b>🖼️ Images:</b> <span dir="ltr">PNG, JPG, GIF, BMP, SVG, WebP, TIFF</span></p>
+    <p><b>🎵 Audio:</b> <span dir="ltr">MP3, WAV, FLAC, OGG, M4A, AAC</span></p>
+    <p><b>🎬 Video:</b> <span dir="ltr">MP4, AVI, MKV, MOV, WebM</span></p>
+    <p><b>📦 Archives:</b> <span dir="ltr">ZIP, RAR, 7Z, TAR, GZ</span></p>
+    <p><b>💻 Code:</b> <span dir="ltr">JS, PY, TS, HTML, CSS, Java, Kotlin</span></p>
+  </div>
+</section>
+
+<!-- ================= CRYPTO ================= -->
+<section id="crypto">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 015-5 5 5 0 015 5"/></svg></span>
+    <h2>Encryption details<small>How your file is protected</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Layer 1: Hiding (Steganography) <span class="tag info">LSB</span></h3>
+    <p>The payload is stored in the <b>least significant bits</b> of the carrier — too small to see or hear with normal tools.</p>
+    <div class="grid">
+      <div class="mini"><b>Images</b><br>Last bit of each RGB channel changes. Max color shift: 1/255.</div>
+      <div class="mini"><b>Audio</b><br>LSB of each sample changes. Inaudible to the human ear.</div>
+      <div class="mini"><b>Generic files</b><br>Last bit of each byte after the file header changes.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Layer 2: Encryption <span class="tag">AES-256-GCM</span></h3>
+    <p>If a password is set, data is encrypted with <b>AES-256-GCM</b> before hiding:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+      <tr><td>Algorithm</td><td dir="ltr">AES/GCM/NoPadding</td><td>authenticated encryption</td></tr>
+      <tr><td>Key size</td><td dir="ltr">256 bits</td><td>resistant to current quantum attacks</td></tr>
+      <tr><td>Key derivation</td><td dir="ltr">PBKDF2WithHmacSHA256</td><td>password-to-key standard</td></tr>
+      <tr><td>Iterations</td><td dir="ltr">600,000</td><td>brute-force resistant</td></tr>
+      <tr><td>Salt</td><td dir="ltr">16 bytes</td><td>random (SecureRandom)</td></tr>
+      <tr><td>Nonce (IV)</td><td dir="ltr">12 bytes</td><td>random (SecureRandom)</td></tr>
+      <tr><td>GCM tag</td><td dir="ltr">128 bits</td><td>data integrity check</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>Output file structure <span class="tag info">tech</span></h3>
+    <div class="code"><header><span>binary structure</span></header><pre>
+┌─────────────────────────────────────────────────┐
+│  Magic Bytes: SGP2 / SGF1 / SGA1  (4 bytes)    │
+│  Payload Length                    (8 bytes)    │
+│  ┌───────────────────────────────────────────┐  │
+│  │  Encrypted/CRC'd Payload                 │  │
+│  │  ┌─────────────────────────────────────┐  │  │
+│  │  │  Filename Length      (4 bytes)     │  │  │
+│  │  │  Filename (UTF-8)    (≤1024 bytes) │  │  │
+│  │  │  File Content         (N bytes)     │  │  │
+│  │  └─────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────┘</pre></div>
+  </div>
+
+  <div class="card">
+    <h3>Smart Magic-Bytes detection <span class="tag info">tech</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Format</th><th>Magic Bytes</th><th>Safe offset</th></tr>
+      <tr><td>JPEG</td><td dir="ltr">FF D8</td><td>variable — scans to SOS/EOI</td></tr>
+      <tr><td>PDF</td><td dir="ltr">25 25 (%%)</td><td>variable — scans to %%EOF</td></tr>
+      <tr><td>ZIP</td><td dir="ltr">50 4B 03 04</td><td dir="ltr">30</td></tr>
+      <tr><td>RAR</td><td dir="ltr">52 69 63 68</td><td dir="ltr">12</td></tr>
+      <tr><td>Matroska</td><td dir="ltr">1A 45 DF A3</td><td dir="ltr">4</td></tr>
+      <tr><td>GIF</td><td dir="ltr">47 49 46</td><td dir="ltr">13</td></tr>
+      <tr><td>TIFF</td><td dir="ltr">49 49 2A 00 / 4D 4D 00 2A</td><td dir="ltr">8</td></tr>
+      <tr><td>Others</td><td>—</td><td dir="ltr">4 (default)</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ================= CAPACITY ================= -->
+<section id="capacity">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></span>
+    <h2>Capacity<small>How much can you hide</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Capacity formulas <span class="tag info">math</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Carrier</th><th>Formula</th><th>Example</th></tr>
+      <tr><td><b>PNG/BMP</b></td><td dir="ltr">(width × height × 3) ÷ 8</td><td>1920×1080 image ≈ 777 KB</td></tr>
+      <tr><td><b>WAV</b></td><td dir="ltr">(samples × channels) ÷ 8</td><td>10s @44.1kHz ≈ 259 KB</td></tr>
+      <tr><td><b>Generic</b></td><td dir="ltr">(file size − safe offset) ÷ 8</td><td>1 MB file ≈ 122 KB</td></tr>
+    </table></div>
+    <div class="note info"><b>💡 Note</b>Usable capacity is slightly less than raw capacity. The app reserves ~50 bytes for headers and crypto overhead. With a password, encrypted data is slightly larger (salt + nonce + GCM tag).</div>
+  </div>
+
+  <div class="card">
+    <h3>Quick capacity guide <span class="tag ok">practical</span></h3>
+    <div class="grid">
+      <div class="mini"><b>🖼️ 12 MP photo</b><br>≈ 4.3 MB — enough for a PDF or several photos.</div>
+      <div class="mini"><b>🎵 1 min WAV</b><br>≈ 1.5 MB — enough for documents or small images.</div>
+      <div class="mini"><b>📄 1 MB file</b><br>≈ 122 KB — enough for text files.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIMITS ================= -->
+<section id="limits">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+    <h2>Limits &amp; notes<small>Read before using</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Technical limits <span class="tag warn">important</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Limit</th><th>Details</th><th>Fix</th></tr>
+      <tr><td><b>Max payload</b></td><td>hidden file ≤ 50 MB</td><td>ZIP it or split into parts</td></tr>
+      <tr><td><b>Filename length</b></td><td>≤ 1024 bytes (~340 Persian chars)</td><td>use shorter names</td></tr>
+      <tr><td><b>Lossy formats</b></td><td>JPEG/WebP may corrupt data</td><td>use PNG or BMP</td></tr>
+      <tr><td><b>Limited capacity</b></td><td>depends on carrier size</td><td>pick a bigger carrier</td></tr>
+      <tr><td><b>Edited carriers</b></td><td>cropping/editing after hiding destroys data</td><td>don't touch the output</td></tr>
+      <tr><td><b>V1 legacy</b></td><td>old files have no original name</td><td>use the new version</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>Security warnings <span class="tag warn">read me</span></h3>
+    <ul class="tips">
+      <li><b>Don't forget your password:</b> recovery is impossible without it.</li>
+      <li><b>Use a strong password:</b> mix letters, digits and symbols.</li>
+      <li><b>Keep the carrier:</b> it is the only key to your hidden file.</li>
+      <li><b>Don't share directly:</b> email/messenger may compress or edit the carrier.</li>
+      <li><b>Back up:</b> always keep a copy of the carrier.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Best practices <span class="tag ok">recommended</span></h3>
+    <ul class="tips">
+      <li>✅ Use <b>PNG</b> — best format, no quality loss, no corruption risk.</li>
+      <li>✅ Set a <b>strong password</b> — extra layer even if hiding is discovered.</li>
+      <li>✅ <b>Don't modify</b> the carrier — any edit/compression may corrupt data.</li>
+      <li>❌ Don't use <b>JPEG</b> — lossy, may destroy the hidden data.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+    <h2>Troubleshooting &amp; FAQ<small>90% of problems are one of these</small></h2>
+  </div>
+
+  <div class="card">
+    <div class="tbl-wrap"><table>
+      <tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr>
+      <tr><td>"Wrong password or corrupted file"</td><td>wrong password, or carrier edited/compressed</td><td>recheck password; use the pristine carrier</td></tr>
+      <tr><td>"File is corrupted"</td><td>carrier damaged by compression/editing</td><td>use the original carrier; prefer PNG</td></tr>
+      <tr><td>Not enough capacity</td><td>carrier smaller than payload</td><td>bigger carrier or compress the payload</td></tr>
+      <tr><td>Output won't open</td><td>wrong default app</td><td>open with a proper viewer (e.g. image viewer for PNG)</td></tr>
+      <tr><td>"Password is empty"</td><td>password field left blank</td><td>enter one, or leave empty intentionally (no encryption)</td></tr>
+      <tr><td>No filename shown</td><td>hidden with old V1 version</td><td>extracted name will be "recovered_file" — normal</td></tr>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>Comparison <span class="tag info">vs others</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Feature</th><th>StegaSuite</th><th>Similar tools</th></tr>
+      <tr><td>Encryption</td><td><b>AES-256-GCM</b></td><td>usually AES-128 or none</td></tr>
+      <tr><td>Carriers</td><td><b>30+ formats</b></td><td>mostly PNG/JPEG</td></tr>
+      <tr><td>Detection</td><td><b>automatic (Magic Bytes)</b></td><td>manual or extension-only</td></tr>
+      <tr><td>UI</td><td><b>Persian + English</b></td><td>mostly English</td></tr>
+      <tr><td>Open source</td><td><b>yes</b></td><td>usually not</td></tr>
+      <tr><td>V1/V2 support</td><td><b>backward compatible</b></td><td>usually not</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- ================= ADVANCED ================= -->
+<section id="advanced">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+    <h2>Advanced notes<small>For power users</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>Format versions <span class="tag info">tech</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>Version</th><th>Magic</th><th>Feature</th></tr>
+      <tr><td><b>V1 Legacy</b></td><td dir="ltr">SGP1</td><td>no stored filename — output name: "recovered_file"</td></tr>
+      <tr><td><b>V2 Current</b></td><td dir="ltr">SGP2</td><td>includes original UTF-8 filename</td></tr>
+      <tr><td><b>File V1</b></td><td dir="ltr">SGF1</td><td>generic file hiding (non-image)</td></tr>
+      <tr><td><b>Audio V1</b></td><td dir="ltr">SGA1</td><td>hiding in WAV audio</td></tr>
+    </table></div>
+    <div class="note info"><b>💡 Backward compatible</b>The new version can extract old V1 files. But the old version cannot extract new V2 files.</div>
+  </div>
+
+  <div class="card">
+    <h3>LSB bit structure <span class="tag">tech</span></h3>
+    <div class="code"><header><span>LSB Encoding</span></header><pre>
+Original pixel:  R=10110100  G=11001011  B=01101010
+                                        ↑       ↑       ↑
+LSB hidden:      R=1011010**0** G=1100101**1** B=0110101**0**
+                                         ↑       ↑       ↑
+                                         └───────┴───────┘
+                                         3 bits per pixel
+                                         Max color shift: 1/255
+
+Capacity: width × height × 3 bits ÷ 8 = bytes</pre></div>
+  </div>
+</section>
+
+
+<footer>
+  Built for the StegaSuite project — designed by alvandcode
+  <div class="links">
+    <a href="https://github.com/Alvandcode/StegaSuite" target="_blank" rel="noopener">⭐ Android GitHub</a>
+    <a href="https://github.com/Alvandcode/StegaSuite/releases" target="_blank" rel="noopener">⬇️ Download APK</a>
+    <a href="https://github.com/Alvandcode/StegaSuite-Windows" target="_blank" rel="noopener">🪟 Windows GitHub</a>
+    <a href="https://github.com/Alvandcode/StegaSuite-Windows/releases" target="_blank" rel="noopener">⬇️ Download Windows</a>
+  </div>
+  <br><a class="top" href="#top">Back to top</a>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('#navlinks a'));
+  var map = {};
+  links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+  var ids = Object.keys(map);
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        links.forEach(function(a){ a.classList.remove('active'); });
+        var a = map[en.target.id]; if(a) a.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  ids.forEach(function(id){
+    var el = document.getElementById(id); if(el) obs.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
