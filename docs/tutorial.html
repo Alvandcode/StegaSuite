@@ -155,14 +155,15 @@
   <p class="subtitle">مخفی‌سازی امن فایل‌ها با رمزنگاری AES-256 — هر فایلی را درون هر فایلی پنهان کن</p>
   <div class="badges">
     <span class="badge">AES-256-GCM</span>
-    <span class="badge">اندروید</span>
+    <span class="badge">اندروید + ویندوز</span>
     <span class="badge">تم فارسی و انگلیسی</span>
     <span class="badge">۳۰+ فرمت پشتیبانی</span>
     <span class="badge">بدون نیاز به روت</span>
     <span class="badge">متن‌باز</span>
   </div>
   <div class="cta">
-    <a class="btn-primary" href="https://github.com/Alvandcode/StegaSuite/releases" target="_blank" rel="noopener">⬇️ دانلود آخرین نسخه</a>
+    <a class="btn-primary" href="https://github.com/Alvandcode/StegaSuite/releases" target="_blank" rel="noopener">⬇️ دانلود اندروید (APK)</a>
+    <a class="btn-primary" href="https://github.com/Alvandcode/StegaSuite-Windows/releases" target="_blank" rel="noopener" style="background:#0ea5e9;color:#fff">⬇️ دانلود ویندوز (EXE)</a>
     <a class="btn-outline" href="https://github.com/Alvandcode/StegaSuite" target="_blank" rel="noopener">⭐ ستاره به پروژه</a>
   </div>
 </header>
@@ -172,6 +173,7 @@
   <a href="#features">امکانات</a>
   <a href="#hide">مخفی‌سازی</a>
   <a href="#extract">استخراج</a>
+  <a href="#windows">نسخه ویندوز</a>
   <a href="#formats">فرمت‌ها</a>
   <a href="#crypto">رمزنگاری</a>
   <a href="#capacity">ظرفیت</a>
@@ -344,6 +346,64 @@
     <div class="ph">🔓</div>
     <b>اسکرین‌شات محیط استخراج</b><br>
     نمای اپلیکیشن در حالت Extract با فایل حامل انتخاب شده
+  </div>
+</section>
+
+<!-- ================= WINDOWS ================= -->
+<section id="windows">
+  <div class="sec-head">
+    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+    <h2>نسخه ویندوز<small>همان موتور، رابط دسکتاپ WPF — سازگار با اندروید</small></h2>
+  </div>
+
+  <div class="card">
+    <h3>دانلود نسخه ویندوز <span class="tag ok">Windows 10/11 x64</span></h3>
+    <div class="tbl-wrap"><table>
+      <tr><th>نسخه</th><th>فایل</th><th>توضیح</th></tr>
+      <tr><td><b>نصبی (خودکفا)</b></td><td dir="ltr">StegaSuite-Install-2.0.0.zip</td><td>باز کن و <span dir="ltr">Install.bat</span> را اجرا کن (با ادمین → Program Files، بدون ادمین → نصب کاربرمحور). بدون نیاز به .NET</td></tr>
+      <tr><td><b>پرتابل</b></td><td dir="ltr">StegaSuite-Portable-2.0.0.exe</td><td>بدون نصب — فقط یک‌بار <a href="https://dotnet.microsoft.com/download" target="_blank" rel="noopener">.NET 10 Desktop Runtime</a> را نصب کن</td></tr>
+    </table></div>
+    <div class="note ok"><b>✅ سازگاری کامل</b>فرمت فایل‌ها یکسان است (<span dir="ltr">SGP2 / SGF1 / SGA1</span>)؛ فایلی که در ویندوز مخفی می‌کنی در اندروید باز می‌شود و برعکس (برای PNG/BMP/WAV).</div>
+    <p style="margin:10px 0">
+      <a href="https://github.com/Alvandcode/StegaSuite-Windows/releases" target="_blank" rel="noopener"><b>⬇️ دانلود از Releases ویندوز</b></a>
+      &nbsp;•&nbsp;
+      <a href="https://github.com/Alvandcode/StegaSuite-Windows" target="_blank" rel="noopener">ریپوی StegaSuite-Windows</a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>گام صفر: ورود / ساخت حساب <span class="tag info">فقط ویندوز</span></h3>
+    <p>برنامه بدون ورود باز نمی‌شود (صفحه لاگین تمام‌صفحه):</p>
+    <ol class="steps">
+      <li><b>ثبت‌نام:</b> نام کاربری + رمز + تکرار رمز → «ساخت حساب».</li>
+      <li><b>کد بازیابی یک‌بارمصرف</b> را همان لحظه یادداشت کن! با آن + فایل بکاپ (<span dir="ltr">*.stegabak</span>) می‌توانی رمز فراموش‌شده را برگردانی.</li>
+      <li><b>ورود:</b> نام کاربری + رمز، یا دکمه <b>Google</b> (مرورگر سیستم + PKCE).</li>
+      <li><b>بکاپ:</b> از ⚙️ تنظیمات → دریافت فایل بکاپ (رمزنگاری‌شده با AES-256-GCM). زبان/تم هر کاربر جدا ذخیره می‌شود.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>مخفی‌سازی در ویندوز <span class="tag ok">🏠 تب خانه</span></h3>
+    <ol class="steps">
+      <li>از سایدبار کپسولی تب <b>🏠 خانه</b> را بزن (حالت پیش‌فرض).</li>
+      <li>در کارت «فایل حامل» روی <b>انتخاب فایل...</b> کلیک کن — یا فایل را <b>بکش و رها کن</b> (درگ‌دراپ).</li>
+      <li>نوع فرمت، نام، اندازه و <b>ظرفیت مخفی‌سازی</b> نمایش داده می‌شود.</li>
+      <li>فایل مخفی‌شونده را در کارت دوم انتخاب کن (هر فرمتی، بدون محدودیت).</li>
+      <li>رمز عبور را بگذار (پیشنهادی — با 👁️ نمایش/پنهان) یا خالی بگذار (فقط CRC32).</li>
+      <li>روی <b>«مخفی کن و ذخیره کن»</b> کلیک کن؛ اسم پیشنهادی <span dir="ltr">(st)</span> دارد مثل <span dir="ltr">photo(st).png</span>. عملیات در <b>History</b> ثبت می‌شود.</li>
+    </ol>
+    <div class="note warn"><b>⚠️ فرمت Lossy</b>برای نتیجه مطمئن در ویندوز هم از <b>PNG / BMP / WAV</b> استفاده کن؛ JPEG و WebP ممکن است دیتا را خراب کنند.</div>
+  </div>
+
+  <div class="card">
+    <h3>استخراج در ویندوز <span class="tag ok">🔓 تب استخراج</span></h3>
+    <ol class="steps">
+      <li>از سایدبار تب <b>🔓 استخراج</b> را بزن.</li>
+      <li>فایل حامل را انتخاب کن (درگ‌دراپ هم می‌شود).</li>
+      <li>اگر رمز گذاشته بودی، همان رمز را وارد کن.</li>
+      <li>روی <b>«استخراج فایل مخفی»</b> کلیک کن — فایل با <b>نام و پسوند اصلی</b> ذخیره می‌شود.</li>
+    </ol>
+    <div class="note info"><b>💡 تب‌های دیگر:</b>ℹ️ درباره • ✉️ تماس • ❤️ حمایت • ⚙️ تنظیمات (۵ زبان: فارسی، عربی، انگلیسی، روسی، چینی + ۹ تم تیره/روشن).</div>
   </div>
 </section>
 
@@ -654,8 +714,10 @@ Capacity: width × height × 3 bits ÷ 8 = bytes</pre></div>
 <footer>
   ساخته‌شده برای پروژه StegaSuite — طراحی توسط alvandcode
   <div class="links">
-    <a href="https://github.com/Alvandcode/StegaSuite" target="_blank" rel="noopener">⭐ گیت‌هاب پروژه</a>
+    <a href="https://github.com/Alvandcode/StegaSuite" target="_blank" rel="noopener">⭐ گیت‌هاب اندروید</a>
     <a href="https://github.com/Alvandcode/StegaSuite/releases" target="_blank" rel="noopener">⬇️ دانلود APK</a>
+    <a href="https://github.com/Alvandcode/StegaSuite-Windows" target="_blank" rel="noopener">🪟 گیت‌هاب ویندوز</a>
+    <a href="https://github.com/Alvandcode/StegaSuite-Windows/releases" target="_blank" rel="noopener">⬇️ دانلود نسخه ویندوز</a>
   </div>
   <br><a class="top" href="#top">بازگشت به بالا</a>
 </footer>
