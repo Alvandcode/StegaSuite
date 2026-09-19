@@ -25,6 +25,17 @@
 
 ---
 
+## 📥 Download / دانلود
+
+| Edition | Link | Notes |
+|---------|------|-------|
+| 🤖 **Android (this repo)** | [Android Releases](https://github.com/Alvandcode/StegaSuite/releases) | `StegaSuite-v{version}.apk` — direct install, no root needed |
+| 🪟 **Windows (sister repo)** | [Windows Releases](https://github.com/Alvandcode/StegaSuite-Windows/releases) | `StegaSuite-Install-*.zip` (self-contained installer) or `StegaSuite-Portable-*.exe` (needs .NET 10 Desktop Runtime) |
+
+> Same wire format (`SGP2`/`SGF1`/`SGA1`) — files hidden on Android extract on Windows and vice versa.
+
+---
+
 ## 📖 What is StegaSuite?
 
 StegaSuite is an open-source Android steganography application that hides arbitrary files inside carrier files (images, audio, video, documents, etc.) using **LSB (Least Significant Bit)** encoding. Unlike traditional encryption which only hides the *content*, Steganography hides the *existence* itself.
