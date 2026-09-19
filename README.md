@@ -36,6 +36,24 @@
 
 ---
 
+## 📲 Install / نصب
+
+1. Go to [Android Releases](https://github.com/Alvandcode/StegaSuite/releases) and download the latest `StegaSuite-v{version}.apk`.
+2. On your phone, allow installs from unknown sources when asked (`Settings → Security → Install unknown apps`).
+3. Open the APK file and tap **Install**. No root needed.
+
+<div dir="rtl">
+
+1. از صفحه [Releases](https://github.com/Alvandcode/StegaSuite/releases) آخرین فایل `StegaSuite-v{version}.apk` را دانلود کنید.
+2. روی گوشی اجازه «نصب از منابع ناشناس» (`Install unknown apps`) را فعال کنید.
+3. فایل APK را باز کنید و **نصب** را بزنید. بدون نیاز به روت.
+
+**نسخه اندروید مورد نیاز:** اندروید ۸٫۰ (Oreo، سطح API ‏26‏) به بالا (`minSdk = 26`، `targetSdk = 35`).
+
+</div>
+
+---
+
 ## 📖 What is StegaSuite?
 
 StegaSuite is an open-source Android steganography application that hides arbitrary files inside carrier files (images, audio, video, documents, etc.) using **LSB (Least Significant Bit)** encoding. Unlike traditional encryption which only hides the *content*, Steganography hides the *existence* itself.
@@ -231,13 +249,32 @@ StegaSuite یک اپلیکیشن اندرویدی متن‌باز برای مخ�
 
 ---
 
-## 🔧 Build in Android Studio
+## 🔧 Build / ساخت
 
-1. Open this folder in Android Studio.
-2. Let Gradle sync.
-3. Select the `app` run configuration.
-4. Connect an Android phone with USB debugging enabled, or use an emulator.
-5. Press Run.
+**Prerequisites / پیش‌نیازها:**
+
+- Android Studio (with Android SDK: platform `android-35` + `build-tools;35.0.0`)
+- JDK 17
+- Gradle 8.9+ (or the project's wrapper, if present)
+
+```bash
+./gradlew assembleDebug
+# اگر فایل `gradlew` در checkout شما نیست: gradle assembleDebug
+```
+
+**Output APK / خروجی:**
+
+- `app/build/outputs/apk/debug/app-debug.apk`
+
+<div dir="rtl">
+
+1. پوشه پروژه را در Android Studio باز کنید.
+2. صبر کنید Gradle Sync تمام شود.
+3. کانفیگ `app` را انتخاب کنید.
+4. گوشی با USB debugging فعال یا یک Emulator وصل کنید.
+5. Run را بزنید — یا برای ساخت APK از ترمینال دستور بالا را اجرا کنید.
+
+</div>
 
 ---
 
@@ -303,10 +340,10 @@ StegaSuite/
 <div dir="rtl">
 
 ### EN
-Issues and Pull Requests are welcome. Please see `CONTRIBUTING.md`.
+Issues and Pull Requests are welcome. Please see [`GITHUB_GUIDE_FA.md`](GITHUB_GUIDE_FA.md) (Persian) and [`UPLOAD_GUIDE.md`](UPLOAD_GUIDE.md).
 
 ### FA
-برای گزارش مشکل یا پیشنهاد قابلیت جدید، لطفا ایشو یا پول‌ریکوئست ثبت کنید.
+برای گزارش مشکل یا پیشنهاد قابلیت جدید، لطفا ایشو یا پول‌ریکوئست ثبت کنید. راهنما: [`GITHUB_GUIDE_FA.md`](GITHUB_GUIDE_FA.md).
 
 </div>
 
